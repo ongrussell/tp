@@ -16,5 +16,4 @@
   📖 Documentation
   * For the detailed documentation of this project, see the **[Teacher's Assistant's Assistant Product Website](https://github.com/AY2526S2-CS2103T-F14-1/tp)**.
 
-* It is named `Teacher's Assistant's Assistant` (`TAA` for short) because it was initially created as a part of a series of `AddressBook` projects (`Level 1`, `Level 2`, `Level 3` ...).
 * This project is based on the AddressBook-Level3 project created by the [SE-EDU initiative](https://se-education.org).
