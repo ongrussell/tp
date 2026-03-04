@@ -4,7 +4,7 @@
   pageNav: 3
 ---
 
-# AB-3 Developer Guide
+# TAA Developer Guide
 
 <!-- * Table of Contents -->
 <page-nav-print />
@@ -274,29 +274,52 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Target user profile**:
 
-* has a need to manage a significant number of contacts
-* prefer desktop apps over other types
+* dislikes sifting through multiple apps to track class data
+* wants organization into a single app
 * can type fast
 * prefers typing to mouse interactions
 * is reasonably comfortable using CLI apps
 
-**Value proposition**: manage contacts faster than a typical mouse/GUI driven app
+**Value proposition**: manage all student-related TA matters on one platform
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                 | So that I can…​                                                        |
-|----------|--------------------------------------------|------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions       | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person             |                                                                        |
-| `* * *`  | user                                       | delete a person              | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name        | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name         | locate a person easily                                                 |
+| Priority | As a …​                        | I want to …​                                                    | So that I can…​                                                                                                     |
+|----------|--------------------------------|-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `* * *`  | user                           | add a new student                                               | add students that are in my tutorial group to my app                                                                |
+| `* * *`  | user                           | delete a student                                                | remove students that are no longer in my tutorial group                                                             |
+| `* * *`  | user                           | record a student's class participation                          | keep track of individual class participation in tutorials                                                           |
+| `* * *`  | user                           | record a student's attendance                                   | keep track of individual attendance in tutorials                                                                    |
+| `* * *`  | user                           | list students within a tutorial group                           | view the students belonging to a specified tutorial group                                                           |
+| `* * *`  | user                           | record student's assignment submissions                         | keep track of individual assignment progress                                                                        |
+| `* * *`  | user                           | find students within a tutorial group                           | search for students in a specified tutorial group                                                                   |
+| `* * *`  | user teaching multiple modules | perform app-specific functions on each module at a time         | mark attendance, record assignment submissions and class participation for students belonging to a specified module |
+| `* *`    | user                           | edit existing student contacts                                  | avoid wasting time deleting and recreating contacts if there’s a typo                                               |
+| `* *`    | user                           | enter information partially (e.g., only name without email)     | add information progressively as I get it                                                                           |
+| `* *`    | user                           | mark attendance using ID and date                               | standardise the commands used for marking attendance                                                                |
+| `* *`    | user                           | add user ID (e.g., matriculation number)                        | differentiate and add students who share the same name                                                              |
+| `* *`    | first-time user                | list the possible commands                                      | view all the commands and use the product without worrying about remembering commands                               |
+| `* *`    | first-time user                | mass delete student contacts                                    | play around with dummy data and easily clear it when I start putting in real data                                   |
+| `* *`    | long-term user                 | import existing student contact data from this app              | restore my previous backups                                                                                         |
+| `*`      | user                           | add notes for certain students                                  | pay specific attention to certain students                                                                          |
+| `*`      | user                           | track operation history                                         | recall my operation history and amend previous mistakes                                                             |
+| `*`      | user                           | identify unfinished student contacts with a tag                 | ensure I remember to finish adding their details later                                                              |
+| `*`      | user                           | view large amounts of information in an organised and clear way | easily find specific information at a glance                                                                        |
+| `*`      | user                           | autocorrect incomplete commands                                 | save time typing and correcting mistakes                                                                            |
+| `*`      | user                           | add multiple tutorial groups to each student                    | input all tutorial groups that a student belongs in                                                                 |
+| `*`      | user                           | do a fuzzy search for names                                     | find information even if I do not remember a student's name fully                                                   |
+| `*`      | first-time user                | import existing contact data from another app                   | migrate easily from a different app                                                                                 |
+| `*`      | long-term user                 | export the program data as a backup                             | prevent losing all my data if I switch devices                                                                      |
+| `*`      | long-term user                 | make new shortcuts for commands or strings                      | use the app more efficiently                                                                                        |
+| `*`      | busy user                      | schedule classes and additional lessons                         | manage my time well and keep track of all classes                                                                   |
+| `*`      | colour-blind user              | change the colour scheme of the UI                              | use the app easily and accessibly                                                                                   |
+| `*`      | forgetful user                 | add profile pictures for each student                           | remember and identify students better                                                                               |
 
-*{More to be added}*
+
+
 
 ### Use cases
 
