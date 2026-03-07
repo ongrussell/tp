@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
- * Represents a Person's address in the address book.
+ * Represents a Person's matriculation number in the address book.
  * Guarantees: immutable; is valid as declared in {@link #isValidMatricNumber(String)}
  */
 public class MatricNumber {
@@ -21,14 +21,14 @@ public class MatricNumber {
     public final String value;
 
     /**
-     * Constructs an {@code Address}.
+     * Constructs a {@code MatricNumber}.
      *
-     * @param address A valid address.
+     * @param matricNumber A valid matriculation number.
      */
-    public MatricNumber(String address) {
-        requireNonNull(address);
-        checkArgument(isValidMatricNumber(address), MESSAGE_CONSTRAINTS);
-        value = address;
+    public MatricNumber(String matricNumber) {
+        requireNonNull(matricNumber);
+        checkArgument(isValidMatricNumber(matricNumber), MESSAGE_CONSTRAINTS);
+        value = matricNumber;
     }
 
     /**
