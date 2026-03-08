@@ -53,7 +53,8 @@ public class MatricNumberTest {
         // same values -> returns true
         assertTrue(matricNumber.equals(new MatricNumber("A1111111Z")));
 
-        //TODO: add case-insensitive test case
+        //different case -> returns true
+        assertTrue(matricNumber.equals(new MatricNumber("a1111111z")));
 
         // same object -> returns true
         assertTrue(matricNumber.equals(matricNumber));
