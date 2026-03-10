@@ -53,9 +53,10 @@ public class Person {
     /**
      * Used for EditCommand. Every field must be present and not null.
      */
-    public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
+    public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags,
+                  Participation participation) {
         this(name, phone, email, matricNumber, tags,
-                person.classSpaces, person.attendance, person.participation);
+                person.classSpaces, person.attendance, participation);
     }
 
     /**
@@ -126,6 +127,10 @@ public class Person {
         return attendance;
     }
 
+    public Participation getParticipation() {
+        return participation;
+    }
+
     /**
      * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
      * if modification is attempted.
@@ -183,6 +188,7 @@ public class Person {
                 && email.equals(otherPerson.email)
                 && matricNumber.equals(otherPerson.matricNumber)
                 && attendance.equals(otherPerson.attendance)
+                && participation.equals(otherPerson.participation)
                 && tags.equals(otherPerson.tags)
                 && classSpaces.equals(otherPerson.classSpaces);
     }
@@ -190,7 +196,7 @@ public class Person {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, matricNumber, tags, classSpaces);
+        return Objects.hash(name, phone, email, matricNumber, attendance, participation, tags, classSpaces);
     }
 
     @Override
@@ -200,6 +206,7 @@ public class Person {
                 .add("phone", phone)
                 .add("email", email)
                 .add("matricNumber", matricNumber)
+                .add("participation", participation)
                 .add("tags", tags)
                 .add("classSpaces", classSpaces)
                 .toString();
