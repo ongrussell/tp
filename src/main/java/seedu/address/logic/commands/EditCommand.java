@@ -24,7 +24,6 @@ import seedu.address.model.Model;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
-import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
@@ -102,11 +101,10 @@ public class EditCommand extends Command {
         MatricNumber updatedMatricNumber = editPersonDescriptor
                 .getMatricNumber()
                 .orElse(personToEdit.getMatricNumber());
-        Participation updatedParticipation = personToEdit.getParticipation();
+        //Participation updatedParticipation = personToEdit.getParticipation();
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        return new Person(personToEdit, updatedName, updatedPhone, updatedEmail, updatedMatricNumber, updatedTags,
-                updatedParticipation);
+        return new Person(personToEdit, updatedName, updatedPhone, updatedEmail, updatedMatricNumber, updatedTags);
     }
 
     @Override

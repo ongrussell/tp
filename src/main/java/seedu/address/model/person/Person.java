@@ -53,10 +53,9 @@ public class Person {
     /**
      * Used for EditCommand. Every field must be present and not null.
      */
-    public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags,
-                  Participation participation) {
+    public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
         this(name, phone, email, matricNumber, tags,
-                person.classSpaces, person.attendance, participation);
+                person.classSpaces, person.attendance, person.participation);
     }
 
     /**
