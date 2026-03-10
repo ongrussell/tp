@@ -10,7 +10,11 @@ import static seedu.address.testutil.TypicalPersons.ALICE;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Predicate;
+
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +26,9 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.ReadOnlyUserPrefs;
+import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -155,6 +162,61 @@ public class AddCommandTest {
 
         @Override
         public void updateFilteredPersonList(Predicate<Person> predicate) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<Person> findPersonByMatricNumber(MatricNumber matricNumber) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean hasClassSpace(ClassSpace classSpace) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<ClassSpace> findClassSpaceByName(ClassSpaceName classSpaceName) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void addClassSpace(ClassSpace classSpace) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void deleteClassSpace(ClassSpace target) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setClassSpace(ClassSpace target, ClassSpace editedClassSpace) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ObservableList<ClassSpace> getClassSpaceList() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void switchToAllStudentsView() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void switchToClassSpaceView(ClassSpaceName classSpaceName) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<ClassSpaceName> getActiveClassSpaceName() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyStringProperty currentViewProperty() {
             throw new AssertionError("This method should not be called.");
         }
     }

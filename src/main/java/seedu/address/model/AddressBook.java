@@ -6,26 +6,23 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.UniqueClassSpaceList;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
 
 /**
- * Wraps all data at the address-book level
- * Duplicates are not allowed (by .isSamePerson comparison)
+ * Wraps all data at the address-book level.
+ * Duplicates are not allowed.
  */
 public class AddressBook implements ReadOnlyAddressBook {
 
     private final UniquePersonList persons;
+    private final UniqueClassSpaceList classSpaces;
 
-    /*
-     * The 'unusual' code block below is a non-static initialization block, sometimes used to avoid duplication
-     * between constructors. See https://docs.oracle.com/javase/tutorial/java/javaOO/initial.html
-     *
-     * Note that non-static init blocks are not recommended to use. There are other ways to avoid duplication
-     *   among constructors.
-     */
     {
         persons = new UniquePersonList();
+        classSpaces = new UniqueClassSpaceList();
     }
 
     public AddressBook() {}
@@ -49,12 +46,21 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     /**
+     * Replaces the contents of the class space list with {@code classSpaces}.
+     * {@code classSpaces} must not contain duplicate class spaces.
+     */
+    public void setClassSpaces(List<ClassSpace> classSpaces) {
+        this.classSpaces.setClassSpaces(classSpaces);
+    }
+
+    /**
      * Resets the existing data of this {@code AddressBook} with {@code newData}.
      */
     public void resetData(ReadOnlyAddressBook newData) {
         requireNonNull(newData);
 
         setPersons(newData.getPersonList());
+        setClassSpaces(newData.getClassSpaceList());
     }
 
     //// person-level operations
@@ -94,12 +100,46 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
+    //// class-space-level operations
+
+    /**
+     * Returns true if a class space with the same identity as {@code classSpace} exists in the address book.
+     */
+    public boolean hasClassSpace(ClassSpace classSpace) {
+        requireNonNull(classSpace);
+        return classSpaces.contains(classSpace);
+    }
+
+    /**
+     * Adds a class space to the address book.
+     * The class space must not already exist in the address book.
+     */
+    public void addClassSpace(ClassSpace classSpace) {
+        classSpaces.add(classSpace);
+    }
+
+    /**
+     * Replaces the given class space {@code target} in the list with {@code editedClassSpace}.
+     */
+    public void setClassSpace(ClassSpace target, ClassSpace editedClassSpace) {
+        requireNonNull(editedClassSpace);
+        classSpaces.setClassSpace(target, editedClassSpace);
+    }
+
+    /**
+     * Removes the given class space from the address book.
+     */
+    public void removeClassSpace(ClassSpace target) {
+        classSpaces.remove(target);
+    }
+
     //// util methods
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("persons", persons)
+                .add("classSpaces", classSpaces)
                 .toString();
     }
 
@@ -109,22 +149,27 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     @Override
+    public ObservableList<ClassSpace> getClassSpaceList() {
+        return classSpaces.asUnmodifiableObservableList();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
         }
 
-        // instanceof handles nulls
         if (!(other instanceof AddressBook)) {
             return false;
         }
 
         AddressBook otherAddressBook = (AddressBook) other;
-        return persons.equals(otherAddressBook.persons);
+        return persons.equals(otherAddressBook.persons)
+                && classSpaces.equals(otherAddressBook.classSpaces);
     }
 
     @Override
     public int hashCode() {
-        return persons.hashCode();
+        return java.util.Objects.hash(persons, classSpaces);
     }
 }

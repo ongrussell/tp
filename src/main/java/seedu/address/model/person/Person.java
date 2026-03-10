@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -24,17 +25,27 @@ public class Person {
     // Data fields
     private final MatricNumber matricNumber;
     private final Set<Tag> tags = new HashSet<>();
+    private final Set<ClassSpaceName> classSpaces = new HashSet<>();
 
     /**
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, matricNumber, tags);
+        this(name, phone, email, matricNumber, tags, Collections.emptySet());
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags,
+                  Set<ClassSpaceName> classSpaces) {
+        requireAllNonNull(name, phone, email, matricNumber, tags, classSpaces);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.matricNumber = matricNumber;
         this.tags.addAll(tags);
+        this.classSpaces.addAll(classSpaces);
     }
 
     public Name getName() {
@@ -59,6 +70,21 @@ public class Person {
      */
     public Set<Tag> getTags() {
         return Collections.unmodifiableSet(tags);
+    }
+
+    /**
+     * Returns an immutable class space set, which throws {@code UnsupportedOperationException}
+     * if modification is attempted.
+     */
+    public Set<ClassSpaceName> getClassSpaces() {
+        return Collections.unmodifiableSet(classSpaces);
+    }
+
+    /**
+     * Returns true if the person belongs to the specified class space.
+     */
+    public boolean hasClassSpace(ClassSpaceName classSpaceName) {
+        return classSpaces.contains(classSpaceName);
     }
 
     /**
@@ -94,13 +120,14 @@ public class Person {
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && matricNumber.equals(otherPerson.matricNumber)
-                && tags.equals(otherPerson.tags);
+                && tags.equals(otherPerson.tags)
+                && classSpaces.equals(otherPerson.classSpaces);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, matricNumber, tags);
+        return Objects.hash(name, phone, email, matricNumber, tags, classSpaces);
     }
 
     @Override
@@ -111,6 +138,7 @@ public class Person {
                 .add("email", email)
                 .add("matricNumber", matricNumber)
                 .add("tags", tags)
+                .add("classSpaces", classSpaces)
                 .toString();
     }
 

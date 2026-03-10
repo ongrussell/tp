@@ -3,6 +3,8 @@ package seedu.address.ui;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
@@ -17,12 +19,16 @@ public class StatusBarFooter extends UiPart<Region> {
     @FXML
     private Label saveLocationStatus;
 
+    @FXML
+    private Label currentViewStatus;
+
     /**
-     * Creates a {@code StatusBarFooter} with the given {@code Path}.
+     * Creates a {@code StatusBarFooter} with the given properties.
      */
-    public StatusBarFooter(Path saveLocation) {
+    public StatusBarFooter(Path saveLocation, ReadOnlyStringProperty currentViewProperty) {
         super(FXML);
         saveLocationStatus.setText(Paths.get(".").resolve(saveLocation).toString());
+        currentViewStatus.textProperty().bind(Bindings.concat("Current view: ", currentViewProperty));
     }
 
 }

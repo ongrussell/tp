@@ -2,13 +2,17 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -21,6 +25,8 @@ import seedu.address.model.tag.Tag;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
+    public static final String MESSAGE_INVALID_INDEX_EXPRESSION = "Index expression must be made up of positive "
+            + "integers, comma-separated integers, or ranges like 1-3.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -36,6 +42,52 @@ public class ParserUtil {
     }
 
     /**
+     * Parses an index expression such as {@code 1}, {@code 1,2,3}, or {@code 1-3,5}.
+     */
+    public static List<Index> parseIndexes(String indexExpression) throws ParseException {
+        requireNonNull(indexExpression);
+        String trimmedExpression = indexExpression.trim();
+        if (trimmedExpression.isEmpty()) {
+            throw new ParseException(MESSAGE_INVALID_INDEX_EXPRESSION);
+        }
+
+        TreeSet<Integer> resolvedIndexes = new TreeSet<>();
+        String[] tokens = trimmedExpression.split(",");
+        for (String token : tokens) {
+            String trimmedToken = token.trim();
+            if (trimmedToken.isEmpty()) {
+                throw new ParseException(MESSAGE_INVALID_INDEX_EXPRESSION);
+            }
+
+            if (trimmedToken.contains("-")) {
+                String[] bounds = trimmedToken.split("-");
+                if (bounds.length != 2 || !StringUtil.isNonZeroUnsignedInteger(bounds[0].trim())
+                        || !StringUtil.isNonZeroUnsignedInteger(bounds[1].trim())) {
+                    throw new ParseException(MESSAGE_INVALID_INDEX_EXPRESSION);
+                }
+
+                int start = Integer.parseInt(bounds[0].trim());
+                int end = Integer.parseInt(bounds[1].trim());
+                if (start > end) {
+                    throw new ParseException(MESSAGE_INVALID_INDEX_EXPRESSION);
+                }
+                for (int i = start; i <= end; i++) {
+                    resolvedIndexes.add(i);
+                }
+            } else {
+                if (!StringUtil.isNonZeroUnsignedInteger(trimmedToken)) {
+                    throw new ParseException(MESSAGE_INVALID_INDEX_EXPRESSION);
+                }
+                resolvedIndexes.add(Integer.parseInt(trimmedToken));
+            }
+        }
+
+        List<Index> result = new ArrayList<>();
+        resolvedIndexes.forEach(index -> result.add(Index.fromOneBased(index)));
+        return result;
+    }
+
+    /**
      * Parses a {@code String name} into a {@code Name}.
      * Leading and trailing whitespaces will be trimmed.
      *
@@ -48,6 +100,18 @@ public class ParserUtil {
             throw new ParseException(Name.MESSAGE_CONSTRAINTS);
         }
         return new Name(trimmedName);
+    }
+
+    /**
+     * Parses a class space name.
+     */
+    public static ClassSpaceName parseClassSpaceName(String classSpaceName) throws ParseException {
+        requireNonNull(classSpaceName);
+        String trimmedClassSpaceName = classSpaceName.trim();
+        if (!ClassSpaceName.isValidClassSpaceName(trimmedClassSpaceName)) {
+            throw new ParseException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+        }
+        return new ClassSpaceName(trimmedClassSpaceName);
     }
 
     /**

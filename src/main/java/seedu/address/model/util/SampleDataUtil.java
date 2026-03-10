@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -21,27 +23,30 @@ public class SampleDataUtil {
         return new Person[] {
             new Person(new Name("Alex Yeoh"), new Phone("87438807"), new Email("alexyeoh@example.com"),
                 new MatricNumber("a0102035j"),
-                getTagSet("friends")),
+                getTagSet("friends"), getClassSpaceNameSet("T01")),
             new Person(new Name("Bernice Yu"), new Phone("99272758"), new Email("berniceyu@example.com"),
                 new MatricNumber("a9999999J"),
-                getTagSet("colleagues", "friends")),
+                getTagSet("colleagues", "friends"), getClassSpaceNameSet("T01", "Project-Team")),
             new Person(new Name("Charlotte Oliveiro"), new Phone("93210283"), new Email("charlotte@example.com"),
                 new MatricNumber("A1002345U"),
-                getTagSet("neighbours")),
+                getTagSet("neighbours"), getClassSpaceNameSet("T02")),
             new Person(new Name("David Li"), new Phone("91031282"), new Email("lidavid@example.com"),
                 new MatricNumber("A0408987J"),
                 getTagSet("family")),
             new Person(new Name("Irfan Ibrahim"), new Phone("92492021"), new Email("irfan@example.com"),
                 new MatricNumber("A0304556L"),
-                getTagSet("classmates")),
+                getTagSet("classmates"), getClassSpaceNameSet("T02")),
             new Person(new Name("Roy Balakrishnan"), new Phone("92624417"), new Email("royb@example.com"),
                 new MatricNumber("A0504887J"),
-                getTagSet("colleagues"))
+                getTagSet("colleagues"), getClassSpaceNameSet("Project-Team"))
         };
     }
 
     public static ReadOnlyAddressBook getSampleAddressBook() {
         AddressBook sampleAb = new AddressBook();
+        for (String classSpaceName : new String[] {"T01", "T02", "Project-Team", "EmptyGroup"}) {
+            sampleAb.addClassSpace(new ClassSpace(new ClassSpaceName(classSpaceName)));
+        }
         for (Person samplePerson : getSamplePersons()) {
             sampleAb.addPerson(samplePerson);
         }
@@ -57,4 +62,12 @@ public class SampleDataUtil {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Returns a class space name set containing the list of strings given.
+     */
+    public static Set<ClassSpaceName> getClassSpaceNameSet(String... strings) {
+        return Arrays.stream(strings)
+                .map(ClassSpaceName::new)
+                .collect(Collectors.toSet());
+    }
 }

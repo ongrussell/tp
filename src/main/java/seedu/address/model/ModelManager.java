@@ -4,13 +4,19 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
 /**
@@ -22,6 +28,10 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final SimpleStringProperty currentView;
+
+    private Predicate<Person> currentAdditionalPredicate;
+    private ClassSpaceName activeClassSpaceName;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -34,6 +44,9 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        currentView = new SimpleStringProperty(ALL_STUDENTS_VIEW_NAME);
+        currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        refreshFilteredPersonList();
     }
 
     public ModelManager() {
@@ -80,6 +93,7 @@ public class ModelManager implements Model {
     @Override
     public void setAddressBook(ReadOnlyAddressBook addressBook) {
         this.addressBook.resetData(addressBook);
+        refreshFilteredPersonList();
     }
 
     @Override
@@ -94,14 +108,23 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public Optional<Person> findPersonByMatricNumber(MatricNumber matricNumber) {
+        requireNonNull(matricNumber);
+        return addressBook.getPersonList().stream()
+                .filter(person -> person.getMatricNumber().equals(matricNumber))
+                .findFirst();
+    }
+
+    @Override
     public void deletePerson(Person target) {
         addressBook.removePerson(target);
+        refreshFilteredPersonList();
     }
 
     @Override
     public void addPerson(Person person) {
         addressBook.addPerson(person);
-        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+        refreshFilteredPersonList();
     }
 
     @Override
@@ -109,13 +132,60 @@ public class ModelManager implements Model {
         requireAllNonNull(target, editedPerson);
 
         addressBook.setPerson(target, editedPerson);
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public boolean hasClassSpace(ClassSpace classSpace) {
+        requireNonNull(classSpace);
+        return addressBook.hasClassSpace(classSpace);
+    }
+
+    @Override
+    public Optional<ClassSpace> findClassSpaceByName(ClassSpaceName classSpaceName) {
+        requireNonNull(classSpaceName);
+        return addressBook.getClassSpaceList().stream()
+                .filter(classSpace -> classSpace.getClassSpaceName().equals(classSpaceName))
+                .findFirst();
+    }
+
+    @Override
+    public void addClassSpace(ClassSpace classSpace) {
+        requireNonNull(classSpace);
+        addressBook.addClassSpace(classSpace);
+    }
+
+    @Override
+    public void deleteClassSpace(ClassSpace target) {
+        requireNonNull(target);
+        addressBook.removeClassSpace(target);
+        if (activeClassSpaceName != null && activeClassSpaceName.equals(target.getClassSpaceName())) {
+            switchToAllStudentsView();
+            return;
+        }
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public void setClassSpace(ClassSpace target, ClassSpace editedClassSpace) {
+        requireAllNonNull(target, editedClassSpace);
+        addressBook.setClassSpace(target, editedClassSpace);
+        if (activeClassSpaceName != null && activeClassSpaceName.equals(target.getClassSpaceName())) {
+            activeClassSpaceName = editedClassSpace.getClassSpaceName();
+            updateCurrentViewLabel();
+        }
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public ObservableList<ClassSpace> getClassSpaceList() {
+        return addressBook.getClassSpaceList();
     }
 
     //=========== Filtered Person List Accessors =============================================================
 
     /**
-     * Returns an unmodifiable view of the list of {@code Person} backed by the internal list of
-     * {@code versionedAddressBook}
+     * Returns an unmodifiable view of the list of {@code Person} backed by the internal list.
      */
     @Override
     public ObservableList<Person> getFilteredPersonList() {
@@ -125,7 +195,48 @@ public class ModelManager implements Model {
     @Override
     public void updateFilteredPersonList(Predicate<Person> predicate) {
         requireNonNull(predicate);
-        filteredPersons.setPredicate(predicate);
+        currentAdditionalPredicate = predicate;
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public void switchToAllStudentsView() {
+        activeClassSpaceName = null;
+        currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        updateCurrentViewLabel();
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public void switchToClassSpaceView(ClassSpaceName classSpaceName) {
+        requireNonNull(classSpaceName);
+        activeClassSpaceName = classSpaceName;
+        currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        updateCurrentViewLabel();
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public Optional<ClassSpaceName> getActiveClassSpaceName() {
+        return Optional.ofNullable(activeClassSpaceName);
+    }
+
+    @Override
+    public ReadOnlyStringProperty currentViewProperty() {
+        return currentView;
+    }
+
+    private void updateCurrentViewLabel() {
+        currentView.set(activeClassSpaceName == null
+                ? ALL_STUDENTS_VIEW_NAME
+                : activeClassSpaceName.value);
+    }
+
+    private void refreshFilteredPersonList() {
+        Predicate<Person> basePredicate = activeClassSpaceName == null
+                ? PREDICATE_SHOW_ALL_PERSONS
+                : person -> person.hasClassSpace(activeClassSpaceName);
+        filteredPersons.setPredicate(basePredicate.and(currentAdditionalPredicate));
     }
 
     @Override
@@ -134,7 +245,6 @@ public class ModelManager implements Model {
             return true;
         }
 
-        // instanceof handles nulls
         if (!(other instanceof ModelManager)) {
             return false;
         }
@@ -142,7 +252,10 @@ public class ModelManager implements Model {
         ModelManager otherModelManager = (ModelManager) other;
         return addressBook.equals(otherModelManager.addressBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
-                && filteredPersons.equals(otherModelManager.filteredPersons);
+                && filteredPersons.equals(otherModelManager.filteredPersons)
+                && currentView.get().equals(otherModelManager.currentView.get())
+                && Optional.ofNullable(activeClassSpaceName).equals(
+                        Optional.ofNullable(otherModelManager.activeClassSpaceName));
     }
 
 }

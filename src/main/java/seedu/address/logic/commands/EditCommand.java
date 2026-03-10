@@ -103,7 +103,8 @@ public class EditCommand extends Command {
                 .orElse(personToEdit.getMatricNumber());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedMatricNumber, updatedTags);
+        return new Person(updatedName, updatedPhone, updatedEmail, updatedMatricNumber,
+                updatedTags, personToEdit.getClassSpaces());
     }
 
     @Override

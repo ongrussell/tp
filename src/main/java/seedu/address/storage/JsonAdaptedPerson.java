@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -29,6 +30,7 @@ class JsonAdaptedPerson {
     private final String email;
     private final String matricNumber;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
+    private final List<String> classSpaces = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
@@ -36,7 +38,8 @@ class JsonAdaptedPerson {
     @JsonCreator
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("matricNumber") String matricNumber,
-            @JsonProperty("tags") List<JsonAdaptedTag> tags) {
+            @JsonProperty("tags") List<JsonAdaptedTag> tags,
+            @JsonProperty("classSpaces") List<String> classSpaces) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -44,6 +47,14 @@ class JsonAdaptedPerson {
         if (tags != null) {
             this.tags.addAll(tags);
         }
+        if (classSpaces != null) {
+            this.classSpaces.addAll(classSpaces);
+        }
+    }
+
+    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
+                             List<JsonAdaptedTag> tags) {
+        this(name, phone, email, matricNumber, tags, null);
     }
 
     /**
@@ -57,6 +68,10 @@ class JsonAdaptedPerson {
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
+        classSpaces.addAll(source.getClassSpaces().stream()
+                .map(classSpaceName -> classSpaceName.value)
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -68,6 +83,14 @@ class JsonAdaptedPerson {
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
             personTags.add(tag.toModelType());
+        }
+
+        final Set<ClassSpaceName> modelClassSpaces = new HashSet<>();
+        for (String classSpace : classSpaces) {
+            if (!ClassSpaceName.isValidClassSpaceName(classSpace)) {
+                throw new IllegalValueException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+            }
+            modelClassSpaces.add(new ClassSpaceName(classSpace));
         }
 
         if (name == null) {
@@ -104,7 +127,7 @@ class JsonAdaptedPerson {
         final MatricNumber modelMatricNumber = new MatricNumber(matricNumber);
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelTags);
+        return new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelTags, modelClassSpaces);
     }
 
 }

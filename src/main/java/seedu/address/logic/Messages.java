@@ -1,5 +1,6 @@
 package seedu.address.logic;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +46,11 @@ public class Messages {
                 .append(person.getMatricNumber())
                 .append("; Tags: ");
         person.getTags().forEach(builder::append);
+        builder.append("; Class Spaces: ");
+        builder.append(person.getClassSpaces().stream()
+                .sorted(Comparator.comparing(classSpaceName -> classSpaceName.value, String.CASE_INSENSITIVE_ORDER))
+                .map(classSpaceName -> classSpaceName.value)
+                .collect(Collectors.joining(", ")));
         return builder.toString();
     }
 

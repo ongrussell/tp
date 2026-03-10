@@ -9,14 +9,21 @@ import java.util.regex.Pattern;
 
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddToGroupCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
+import seedu.address.logic.commands.CreateGroupCommand;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeleteGroupCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ListGroupsCommand;
+import seedu.address.logic.commands.RemoveFromGroupCommand;
+import seedu.address.logic.commands.RenameGroupCommand;
+import seedu.address.logic.commands.SwitchGroupCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
@@ -46,9 +53,6 @@ public class AddressBookParser {
         final String commandWord = matcher.group("commandWord");
         final String arguments = matcher.group("arguments");
 
-        // Note to developers: Change the log level in config.json to enable lower level (i.e., FINE, FINER and lower)
-        // log messages such as the one below.
-        // Lower level log messages are used sparingly to minimize noise in the code.
         logger.fine("Command word: " + commandWord + "; Arguments: " + arguments);
 
         switch (commandWord) {
@@ -70,6 +74,30 @@ public class AddressBookParser {
 
         case ListCommand.COMMAND_WORD:
             return new ListCommand();
+
+        case CreateGroupCommand.COMMAND_WORD:
+            return new CreateGroupCommandParser().parse(arguments);
+
+        case DeleteGroupCommand.COMMAND_WORD:
+            return new DeleteGroupCommandParser().parse(arguments);
+
+        case ListGroupsCommand.COMMAND_WORD:
+            if (!arguments.trim().isEmpty()) {
+                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, ListGroupsCommand.MESSAGE_USAGE));
+            }
+            return new ListGroupsCommand();
+
+        case SwitchGroupCommand.COMMAND_WORD:
+            return new SwitchGroupCommandParser().parse(arguments);
+
+        case AddToGroupCommand.COMMAND_WORD:
+            return new AddToGroupCommandParser().parse(arguments);
+
+        case RemoveFromGroupCommand.COMMAND_WORD:
+            return new RemoveFromGroupCommandParser().parse(arguments);
+
+        case RenameGroupCommand.COMMAND_WORD:
+            return new RenameGroupCommandParser().parse(arguments);
 
         case ExitCommand.COMMAND_WORD:
             return new ExitCommand();

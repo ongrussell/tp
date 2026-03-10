@@ -2,7 +2,10 @@ package seedu.address.testutil;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -26,6 +29,7 @@ public class PersonBuilder {
     private Email email;
     private MatricNumber matricNumber;
     private Set<Tag> tags;
+    private Set<ClassSpaceName> classSpaces;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -36,6 +40,7 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         matricNumber = new MatricNumber(DEFAULT_MATRIC_NUMBER);
         tags = new HashSet<>();
+        classSpaces = new HashSet<>();
     }
 
     /**
@@ -47,6 +52,7 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         matricNumber = personToCopy.getMatricNumber();
         tags = new HashSet<>(personToCopy.getTags());
+        classSpaces = new HashSet<>(personToCopy.getClassSpaces());
     }
 
     /**
@@ -73,6 +79,17 @@ public class PersonBuilder {
         return this;
     }
 
+
+    /**
+     * Sets the {@code ClassSpaces} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withClassSpaces(String ... classSpaces) {
+        this.classSpaces = Stream.of(classSpaces)
+                .map(ClassSpaceName::new)
+                .collect(Collectors.toSet());
+        return this;
+    }
+
     /**
      * Sets the {@code Phone} of the {@code Person} that we are building.
      */
@@ -90,7 +107,7 @@ public class PersonBuilder {
     }
 
     public Person build() {
-        return new Person(name, phone, email, matricNumber, tags);
+        return new Person(name, phone, email, matricNumber, tags, classSpaces);
     }
 
 }

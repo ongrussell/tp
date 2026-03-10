@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.classspace.ClassSpace;
 import seedu.address.model.person.Person;
 
 /**
@@ -20,24 +21,33 @@ import seedu.address.model.person.Person;
 class JsonSerializableAddressBook {
 
     public static final String MESSAGE_DUPLICATE_PERSON = "Persons list contains duplicate person(s).";
+    public static final String MESSAGE_DUPLICATE_CLASS_SPACE = "Class space list contains duplicate class space(s).";
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
+    private final List<JsonAdaptedClassSpace> classSpaces = new ArrayList<>();
 
     /**
-     * Constructs a {@code JsonSerializableAddressBook} with the given persons.
+     * Constructs a {@code JsonSerializableAddressBook} with the given persons and class spaces.
      */
     @JsonCreator
-    public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons) {
-        this.persons.addAll(persons);
+    public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
+            @JsonProperty("classSpaces") List<JsonAdaptedClassSpace> classSpaces) {
+        if (persons != null) {
+            this.persons.addAll(persons);
+        }
+        if (classSpaces != null) {
+            this.classSpaces.addAll(classSpaces);
+        }
     }
 
     /**
      * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use.
-     *
-     * @param source future changes to this will not affect the created {@code JsonSerializableAddressBook}.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
         persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
+        classSpaces.addAll(source.getClassSpaceList().stream()
+                .map(JsonAdaptedClassSpace::new)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -47,10 +57,25 @@ class JsonSerializableAddressBook {
      */
     public AddressBook toModelType() throws IllegalValueException {
         AddressBook addressBook = new AddressBook();
+
+        for (JsonAdaptedClassSpace jsonAdaptedClassSpace : classSpaces) {
+            ClassSpace classSpace = jsonAdaptedClassSpace.toModelType();
+            if (addressBook.hasClassSpace(classSpace)) {
+                throw new IllegalValueException(MESSAGE_DUPLICATE_CLASS_SPACE);
+            }
+            addressBook.addClassSpace(classSpace);
+        }
+
         for (JsonAdaptedPerson jsonAdaptedPerson : persons) {
             Person person = jsonAdaptedPerson.toModelType();
             if (addressBook.hasPerson(person)) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_PERSON);
+            }
+            for (var classSpaceName : person.getClassSpaces()) {
+                ClassSpace classSpace = new ClassSpace(classSpaceName);
+                if (!addressBook.hasClassSpace(classSpace)) {
+                    addressBook.addClassSpace(classSpace);
+                }
             }
             addressBook.addPerson(person);
         }
