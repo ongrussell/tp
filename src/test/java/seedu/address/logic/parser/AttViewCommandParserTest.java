@@ -1,6 +1,5 @@
 package seedu.address.logic.parser;
 
-import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
@@ -35,7 +34,8 @@ public class AttViewCommandParserTest {
         assertParseSuccess(parser, "", new AttViewCommand());
         assertParseSuccess(parser, "present", new AttViewCommand(new Attendance("PRESENT")));
         assertParseSuccess(parser, "  ABSENT  ", new AttViewCommand(new Attendance("ABSENT")));
-        assertParseSuccess(parser, "g/T01", new AttViewCommand(new seedu.address.model.classspace.ClassSpaceName("T01")));
+        assertParseSuccess(parser, "g/T01",
+                new AttViewCommand(new seedu.address.model.classspace.ClassSpaceName("T01")));
         assertParseSuccess(parser, "present g/T01",
                 new AttViewCommand(new Attendance("PRESENT"),
                         new seedu.address.model.classspace.ClassSpaceName("T01")));
