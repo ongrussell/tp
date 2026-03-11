@@ -56,8 +56,9 @@ public class RenameGroupCommand extends Command {
             Set<ClassSpaceName> updatedClassSpaces = new HashSet<>(person.getClassSpaces());
             updatedClassSpaces.remove(targetName);
             updatedClassSpaces.add(newName);
-            Person updatedPerson = new Person(person.getName(), person.getPhone(), person.getEmail(),
-                    person.getMatricNumber(), person.getParticipation(), person.getTags(), updatedClassSpaces);
+            //Person updatedPerson = new Person(person.getName(), person.getPhone(), person.getEmail(),
+            //        person.getMatricNumber(), person.getTags(), updatedClassSpaces);
+            Person updatedPerson = new Person(person, updatedClassSpaces);
             model.setPerson(person, updatedPerson);
         }
 

@@ -20,7 +20,7 @@ public class PartCommand extends Command {
     public static final String COMMAND_WORD = "part";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Assigns participation to the person identified by the index number used in the displayed person list.\n"
+            + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
             + "Parameters: INDEX PARTICIPATION\n"
             + "Participation must be an integer from 0 to 5.\n"
             + "Example: " + COMMAND_WORD + " 1 4";
@@ -31,6 +31,14 @@ public class PartCommand extends Command {
     private final Index targetIndex;
     private final Participation participation;
 
+    /**
+     * Creates a PartCommand to assign the specified {@code Participation}
+     * value to the person identified by the given {@code Index}.
+     *
+     * @param targetIndex Index of the person in the filtered person list whose participation
+     *                    level is to be updated.
+     * @param participation Participation value to assign to the specified person.
+     */
     public PartCommand(Index targetIndex, Participation participation) {
         requireNonNull(targetIndex);
         requireNonNull(participation);
@@ -48,14 +56,7 @@ public class PartCommand extends Command {
         }
 
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
-        Person updatedPerson = new Person(
-                personToUpdate.getName(),
-                personToUpdate.getPhone(),
-                personToUpdate.getEmail(),
-                personToUpdate.getMatricNumber(),
-                participation,
-                personToUpdate.getTags(),
-                personToUpdate.getClassSpaces());
+        Person updatedPerson = new Person(personToUpdate, participation);
 
         model.setPerson(personToUpdate, updatedPerson);
         return new CommandResult(String.format(MESSAGE_PARTICIPATION_SUCCESS, Messages.format(updatedPerson)));

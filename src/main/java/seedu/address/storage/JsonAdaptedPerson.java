@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
-import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
@@ -30,7 +27,7 @@ class JsonAdaptedPerson {
     private final String phone;
     private final String email;
     private final String matricNumber;
-    private final Integer participation;
+    //private final Integer participation;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
     private final List<String> classSpaces = new ArrayList<>();
 
@@ -40,25 +37,28 @@ class JsonAdaptedPerson {
     @JsonCreator
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("matricNumber") String matricNumber,
-            @JsonProperty("participation") Integer participation,
-            @JsonProperty("tags") List<JsonAdaptedTag> tags,
-            @JsonProperty("classSpaces") List<String> classSpaces) {
+            //@JsonProperty("participation") Integer participation,
+            @JsonProperty("tags") List<JsonAdaptedTag> tags) {
+        //@JsonProperty("classSpaces") List<String> classSpaces)
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.matricNumber = matricNumber;
-        this.participation = participation;
+        //this.participation = participation;
         if (tags != null) {
             this.tags.addAll(tags);
         }
+        /*
         if (classSpaces != null) {
             this.classSpaces.addAll(classSpaces);
         }
+         */
     }
 
     public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
                              Integer participation, List<JsonAdaptedTag> tags) {
-        this(name, phone, email, matricNumber, participation, tags, null);
+        //this(name, phone, email, matricNumber, participation, tags, null);
+        this(name, phone, email, matricNumber, tags);
     }
 
     /**
@@ -69,14 +69,14 @@ class JsonAdaptedPerson {
         phone = source.getPhone().value;
         email = source.getEmail().value;
         matricNumber = source.getMatricNumber().value;
-        participation = source.getParticipation().value;
+        //participation = source.getParticipation().value;
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
-                .collect(Collectors.toList()));
+                .toList());
         classSpaces.addAll(source.getClassSpaces().stream()
                 .map(classSpaceName -> classSpaceName.value)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     /**
@@ -90,6 +90,7 @@ class JsonAdaptedPerson {
             personTags.add(tag.toModelType());
         }
 
+        /*
         final Set<ClassSpaceName> modelClassSpaces = new HashSet<>();
         for (String classSpace : classSpaces) {
             if (!ClassSpaceName.isValidClassSpaceName(classSpace)) {
@@ -97,6 +98,7 @@ class JsonAdaptedPerson {
             }
             modelClassSpaces.add(new ClassSpaceName(classSpace));
         }
+         */
 
         if (name == null) {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Name.class.getSimpleName()));
@@ -131,6 +133,7 @@ class JsonAdaptedPerson {
         }
         final MatricNumber modelMatricNumber = new MatricNumber(matricNumber);
 
+        /*
         final Participation modelParticipation;
         if (participation == null) {
             modelParticipation = new Participation(0);
@@ -139,10 +142,13 @@ class JsonAdaptedPerson {
         } else {
             modelParticipation = new Participation(participation);
         }
+         */
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelMatricNumber,
-                modelParticipation, modelTags, modelClassSpaces);
+        //return new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelTags, modelClassSpaces);
+        //return new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelParticipation, modelTags,
+        //        modelClassSpaces);
+        return new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelTags);
     }
 
 }

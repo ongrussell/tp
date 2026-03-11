@@ -79,7 +79,6 @@ public class PersonBuilder {
         return this;
     }
 
-
     /**
      * Sets the {@code ClassSpaces} of the {@code Person} that we are building.
      */
@@ -106,8 +105,15 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Builds and returns a {@code Person} with the configured details.
+     *
+     * @return a new {@code Person} instance
+     */
     public Person build() {
-        return new Person(name, phone, email, matricNumber, tags, classSpaces);
+        return new Person(name, phone, email, matricNumber, classSpaces, tags);
+        // TODO: Might need this ^ when implementing /tg into AddCommand
+        //return new Person(name, phone, email, matricNumber, tags);
     }
 
 }
