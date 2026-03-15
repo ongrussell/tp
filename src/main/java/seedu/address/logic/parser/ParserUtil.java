@@ -138,10 +138,11 @@ public class ParserUtil {
     public static MatricNumber parseMatricNumber(String matricNumber) throws ParseException {
         requireNonNull(matricNumber);
         String trimmedMatricNumber = matricNumber.trim();
-        if (!MatricNumber.isValidMatricNumber(trimmedMatricNumber)) {
-            throw new ParseException(MatricNumber.MESSAGE_CONSTRAINTS);
+        try {
+            return new MatricNumber(trimmedMatricNumber);
+        } catch (IllegalArgumentException e) {
+            throw new ParseException(e.getMessage());
         }
-        return new MatricNumber(trimmedMatricNumber);
     }
 
     /**

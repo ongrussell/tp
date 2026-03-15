@@ -5,12 +5,17 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
  * Represents a Person's matriculation number in the address book.
- * Guarantees: immutable; is valid as declared in {@link #isValidMatricNumber(String)}
+ * Guarantees: immutable; is valid as declared in {@link #isValidFormat(String)}
  */
 public class MatricNumber {
 
+    public static final int CHECKSUM_POSITION = 8;
+
     public static final String MESSAGE_CONSTRAINTS = "Matriculation numbers should start with `A`,"
-            + " followed by 7 digits and end with a capital letter.";
+            + " followed by 7 digits and end with a valid checksum letter.";
+
+    public static final String MESSAGE_INVALID_CHECKSUM =
+            "The matriculation number checksum letter is incorrect. For the given digits, it should be '%c'.";
 
     /*
      * The first character of the matriculation number must be the alphabet 'A'.
@@ -26,15 +31,73 @@ public class MatricNumber {
      */
     public MatricNumber(String matricNumber) {
         requireNonNull(matricNumber);
-        checkArgument(isValidMatricNumber(matricNumber), MESSAGE_CONSTRAINTS);
-        value = matricNumber;
+        String upperCaseMatricNumber = matricNumber.toUpperCase();
+        validateMatricNumber(upperCaseMatricNumber);
+        value = upperCaseMatricNumber;
     }
 
     /**
-     * Returns true if a given string is a valid email.
+     * Returns true if matriculation number has a valid format.
+     *
+     * @param matricNumber Matriculation number to be tested.
+     * @return True if matriculation number is valid.
      */
-    public static boolean isValidMatricNumber(String test) {
-        return test.matches(VALIDATION_REGEX);
+    public static boolean isValidFormat(String matricNumber) {
+        return matricNumber.matches(VALIDATION_REGEX);
+    }
+
+    /**
+     * Returns true if matriculation number has a valid checksum letter and format.
+     *
+     * @param matricNumber Matriculation number to be tested.
+     * @return True if matriculation number is valid.
+     */
+    public static boolean isValidMatricNumber(String matricNumber) {
+        return matricNumber != null && isValidFormat(matricNumber) && hasCorrectChecksum(matricNumber);
+    }
+
+    private static boolean hasCorrectChecksum(String matricNumber) {
+        char expectedSum = calculateChecksum(matricNumber);
+        char actualSum = extractProvidedChecksum(matricNumber);
+        return expectedSum == actualSum;
+    }
+
+    private static char extractProvidedChecksum(String matricNumber) {
+        return matricNumber.charAt(CHECKSUM_POSITION);
+    }
+
+    private static String getChecksumErrorMessage(String matricNumber) {
+        return String.format(MESSAGE_INVALID_CHECKSUM, calculateChecksum(matricNumber));
+    }
+
+    private static void validateMatricNumber(String matricNumber) {
+        checkArgument(isValidFormat(matricNumber), MESSAGE_CONSTRAINTS);
+        checkArgument(hasCorrectChecksum(matricNumber), getChecksumErrorMessage(matricNumber));
+    }
+
+    /**
+     * Calculates the checksum character for NUS matriculation numbers.
+     *
+     * @param matricNumber Matriculation number with "A" and 7 digits.
+     * @return Checksum character for matriculation number.
+     */
+    private static char calculateChecksum(String matricNumber) {
+        String checksumLetters = "BAEHJLMNRUWXY";
+        int length = checksumLetters.length();
+        int[] weights = {-1, -1, -1, -1, -1, -1};
+        String digits = matricNumber.substring(2, 8);
+        int sum = 0;
+
+        for (int i = 0; i < digits.length(); i++) {
+            sum += Character.getNumericValue(digits.charAt(i)) * weights[i];
+        }
+
+        int remainder = (sum - 1) % length;
+        if (remainder < 0) {
+            remainder += length;
+        }
+
+        return checksumLetters.charAt(remainder);
     }
 
     @Override
