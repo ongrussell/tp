@@ -79,21 +79,6 @@ public class Session {
     public Participation getParticipation() {
         return participation;
     }
-
-    /**
-     * Returns true if a given string is a valid date format.
-     *
-     * @param test Date in string format.
-     */
-    public static boolean isValidDate(String test) {
-        try {
-            LocalDate.parse(test, DATE_FORMATTER);
-            return true;
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other == this) {

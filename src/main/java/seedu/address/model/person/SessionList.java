@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SessionList implements Iterable<Session> {
 
     /**
      * Adds a session to the list.
-     * If a session on the same date already exists, it is replaced.
+     * If a session on the same date already exists, it is overwritten.
      *
      * @param session Session to be added to the {@code List<Session>}
      */
@@ -57,7 +58,6 @@ public class SessionList implements Iterable<Session> {
                 .filter(session -> session.getDate().equals(date))
                 .findFirst();
     }
-
     /**
      * Retrieves the attendance for a given date, if the session exists.
      *
