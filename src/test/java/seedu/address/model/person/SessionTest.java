@@ -10,7 +10,6 @@ import static seedu.address.logic.commands.CommandTestUtil.ZERO_PARTICIPATION;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
