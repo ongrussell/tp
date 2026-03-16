@@ -155,12 +155,10 @@ public class Person {
      * @return Session belonging to the class space for a given date.
      */
     public Session getOrCreateSession(ClassSpaceName classSpaceName, LocalDate date) {
-        if (classSpaceSessions.containsKey(classSpaceName)) {
-            return classSpaceSessions.get(classSpaceName).getSession(date)
-                    .orElse(new Session(date, new Attendance(Attendance.Status.UNINITIALISED), new Participation(0)));
-        }
-
-        return new Session(date, new Attendance(Attendance.Status.UNINITIALISED), new Participation(0));
+        return classSpaceSessions.getOrDefault(classSpaceName, new SessionList())
+                .getSession(date)
+                .orElseGet(() -> new Session(date,
+                        new Attendance(Attendance.Status.UNINITIALISED), new Participation(0)));
     }
 
     public Name getName() {
