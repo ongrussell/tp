@@ -126,7 +126,7 @@ public class AttViewCommand extends Command {
     public String toString() {
         return new ToStringBuilder(this)
                 .add("attendance", attendance)
-                .add("classSpaceName", classSpaceName)
+                .add("groupName", classSpaceName)
                 .toString();
     }
 }

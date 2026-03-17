@@ -300,7 +300,7 @@ public class Person {
                 .add("matricNumber", matricNumber)
                 //.add("participation", participation) // TODO: This is causing PersonTest.toStringMethod to fail
                 .add("tags", tags)
-                .add("classSpaces", classSpaces)
+                .add("groups", classSpaces)
                 // .add("classSpaceSessions", classSpaceSessions) // TODO: check if necessary
                 .toString();
     }

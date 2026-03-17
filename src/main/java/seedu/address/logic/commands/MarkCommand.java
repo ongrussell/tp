@@ -131,7 +131,7 @@ public class MarkCommand extends Command {
         return new ToStringBuilder(this)
                 .add("targetIndex", targetIndex)
                 .add("date", date)
-                .add("classSpaceName", classSpaceName)
+                .add("groupName", classSpaceName)
                 .toString();
     }
 }

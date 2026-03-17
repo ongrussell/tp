@@ -60,7 +60,7 @@ public class ClassSpace {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("classSpaceName", classSpaceName)
+                .add("groupName", classSpaceName)
                 .toString();
     }
 }

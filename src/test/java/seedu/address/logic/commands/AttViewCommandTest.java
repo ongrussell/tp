@@ -141,7 +141,7 @@ public class AttViewCommandTest {
         Attendance attendance = new Attendance("ABSENT");
         AttViewCommand command = new AttViewCommand(attendance);
         String expected = AttViewCommand.class.getCanonicalName()
-                + "{attendance=Optional[" + attendance + "], classSpaceName=Optional.empty}";
+                + "{attendance=Optional[" + attendance + "], groupName=Optional.empty}";
         assertEquals(expected, command.toString());
     }
 }
