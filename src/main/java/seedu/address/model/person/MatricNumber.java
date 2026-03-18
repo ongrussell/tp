@@ -68,7 +68,7 @@ public class MatricNumber {
         return matricNumber != null;
     }
 
-    private static boolean hasCorrectChecksum(String matricNumber) {
+    private static boolean hasValidChecksum(String matricNumber) {
         return calculateChecksum(matricNumber) == extractProvidedChecksum(matricNumber);
     }
 
