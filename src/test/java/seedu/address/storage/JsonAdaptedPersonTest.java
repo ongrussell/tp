@@ -139,4 +139,16 @@ public class JsonAdaptedPersonTest {
         assertThrows(IllegalValueException.class, ClassSpaceName.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
+    @Test
+    public void toModelType_multipleInvalidFields_throwsIllegalValueException() {
+        // Person with both an invalid email and an invalid matric number.
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, INVALID_EMAIL, "A1234567A", VALID_TAGS);
+
+        String expectedMessage = Email.INVALID_EMAIL_FORMAT + "; "
+                + String.format(MatricNumber.MESSAGE_INVALID_CHECKSUM, 'X');
+
+        assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
+    }
 }
+
