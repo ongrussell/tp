@@ -81,6 +81,16 @@ public class MainWindow extends UiPart<Stage> {
         resultDisplay.setFeedbackToUser(message); // Set the warning message in the result display.
     }
 
+    /**
+     * Returns the {@link ResultDisplay} component.
+     * Used by {@link UiManager} to display startup warnings after initialization.
+     *
+     * @return {@code ResultDisplay}
+     */
+    public ResultDisplay getResultDisplay() {
+        return resultDisplay;
+    }
+
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
     }

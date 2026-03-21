@@ -47,8 +47,6 @@ public class MainApp extends Application {
     protected Model model;
     protected Config config;
 
-    private List<String> startUpWarnings = new ArrayList<>();
-
     @Override
     public void init() throws Exception {
         logger.info("=============================[ Initializing AddressBook ]===========================");
@@ -67,7 +65,7 @@ public class MainApp extends Application {
 
         logic = new LogicManager(model, storage);
 
-        ui = new UiManager(logic);
+        ui = new UiManager(logic, storage.getLastLoadWarnings());
     }
 
     /**
@@ -90,20 +88,10 @@ public class MainApp extends Application {
                         + " populated with a sample AddressBook.");
             }
             initialData = addressBookOptional.orElseGet(SampleDataUtil::getSampleAddressBook);
-            if (storage instanceof StorageManager sm) {
-                List<String> warnings = sm.getLastLoadWarnings();
-                if (!warnings.isEmpty()) {
-                    startUpWarnings.add("Warning: Some contacts were skipped due to invalid data in the save file:");
-                    startUpWarnings.addAll(warnings);
-                }
-            }
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getAddressBookFilePath() + " could not be loaded."
                     + " Will be starting with an empty AddressBook.");
             initialData = new AddressBook();
-            startUpWarnings.add("WARNING: Save file at " + storage.getAddressBookFilePath()
-                    + " could not be loaded and has been replaced with an empty address book."
-                    + " Your previous data may be corrupted.");
         }
 
         return new ModelManager(initialData, userPrefs);
@@ -189,10 +177,6 @@ public class MainApp extends Application {
         logger.info("Starting AddressBook " + MainApp.VERSION);
         ui.start(primaryStage);
 
-        if (!startUpWarnings.isEmpty()) {
-            String warningMessage = String.join("\n", startUpWarnings);
-            ((UiManager) ui).showStartUpWarning(warningMessage);
-        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package seedu.address.ui;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
@@ -24,12 +25,25 @@ public class UiManager implements Ui {
 
     private Logic logic;
     private MainWindow mainWindow;
+    private final List<String> startUpWarnings;
 
     /**
      * Creates a {@code UiManager} with the given {@code Logic}.
      */
     public UiManager(Logic logic) {
+        this(logic, List.of());
+    }
+
+    /**
+     * Creates a {@code UiManager} with the given {@code Logic} and startup warnings
+     * to display in the result panel once the UI is ready.
+     *
+     * @param logic The given {@code Logic}.
+     * @param startupWarnings The list of startup warnings.
+     */
+    public UiManager(Logic logic, List<String> startupWarnings) {
         this.logic = logic;
+        this.startUpWarnings = List.copyOf(startupWarnings);
     }
 
     @Override
@@ -43,11 +57,44 @@ public class UiManager implements Ui {
             mainWindow = new MainWindow(primaryStage, logic);
             mainWindow.show(); //This should be called before creating other UI parts
             mainWindow.fillInnerParts();
+            displayStartUpWarnings();
 
         } catch (Throwable e) {
             logger.severe(StringUtil.getDetails(e));
             showFatalErrorDialogAndShutdown("Fatal error during initializing", e);
         }
+    }
+
+    private void displayStartUpWarnings() {
+        if (startUpWarnings.isEmpty()) {
+            return;
+        }
+        mainWindow.getResultDisplay().setFeedbackToUser(buildStartUpWarningMessage(startUpWarnings));
+    }
+
+    private String buildStartUpWarningMessage(List<String> warnings) {
+        return buildWarningHeader(warnings.size())
+                + buildWarningList(warnings)
+                + buildWarningFooter();
+    }
+
+    private String buildWarningHeader(int count) {
+        return count + (count == 1 ? " contact" : " contacts")
+                + " could not be loaded from the save file and "
+                + (count == 1 ? "was" : "were")
+                + " skipped:\n\n";
+    }
+
+    private String buildWarningList(List<String> warnings) {
+        StringBuilder list = new StringBuilder();
+        for (int i = 0; i < warnings.size(); i++) {
+            list.append(i + 1).append(". ").append(warnings.get(i)).append("\n");
+        }
+        return list.toString();
+    }
+
+    private String buildWarningFooter() {
+        return "\nYou can fix these entries directly in the save file.";
     }
 
     private Image getImage(String imagePath) {
