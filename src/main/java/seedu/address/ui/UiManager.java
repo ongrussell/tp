@@ -70,7 +70,7 @@ public class UiManager implements Ui {
         mainWindow.getResultDisplay().setFeedbackToUser(buildStartUpMessage(startUpWarnings));
     }
 
-    private String buildStartUpMessage(List<String> warnings) {
+    String buildStartUpMessage(List<String> warnings) {
         if (warnings.isEmpty()) {
             return buildSuccessMessage();
         }
@@ -79,7 +79,7 @@ public class UiManager implements Ui {
                 + buildWarningFooter();
     }
 
-    private String buildWarningHeader(int skippedCount) {
+    String buildWarningHeader(int skippedCount) {
         int loadedCount = logic.getFilteredPersonList().size();
         return loadedCount + (loadedCount == 1 ? " contact" : " contacts") + " loaded successfully. "
                 + skippedCount + (skippedCount == 1 ? " contact" : " contacts")
@@ -88,7 +88,7 @@ public class UiManager implements Ui {
                 + " skipped:\n\n";
     }
 
-    private String buildWarningList(List<String> warnings) {
+    String buildWarningList(List<String> warnings) {
         StringBuilder list = new StringBuilder();
         for (int i = 0; i < warnings.size(); i++) {
             list.append(i + 1).append(". ").append(warnings.get(i)).append("\n");
@@ -96,11 +96,11 @@ public class UiManager implements Ui {
         return list.toString();
     }
 
-    private String buildWarningFooter() {
+    String buildWarningFooter() {
         return SAVE_FILE_MESSAGE + logic.getAddressBookFilePath();
     }
 
-    private String buildSuccessMessage() {
+    String buildSuccessMessage() {
         int count = logic.getFilteredPersonList().size();
         return count + (count == 1 ? " contact" : " contacts") + " loaded successfully.";
     }
