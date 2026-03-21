@@ -72,6 +72,15 @@ public class MainWindow extends UiPart<Stage> {
         return primaryStage;
     }
 
+    /**
+     * Displays the provided warning message in the result display.
+     *
+     * @param message The warning message to display in the result display.
+     */
+    public void showStartupWarning(String message) {
+        resultDisplay.setFeedbackToUser(message); // Set the warning message in the result display.
+    }
+
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
     }

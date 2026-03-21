@@ -200,4 +200,14 @@ class JsonAdaptedPerson {
         return modelSessionMap;
     }
 
+    /**
+     * Returns the raw name string from the save file, which may be null if the field was missing.
+     * Intended for use by {@link JsonSerializableAddressBook} to produce human-readable error messages.
+     *
+     * @return Raw name string from save file.
+     */
+    public String getName() {
+        return name;
+    }
+
 }

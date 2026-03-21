@@ -84,5 +84,15 @@ public class UiManager implements Ui {
         Platform.exit();
         System.exit(1);
     }
+    /**
+     * Displays a startup warning message in the result display after the UI has started.
+     * This is used to inform the user about any issues with the saved data file.
+     *
+     * @param message The warning message to display to the user.
+     */
+    public void showStartupWarning(String message) {
+        // Ensure the UI is fully rendered first before showing the warning
+        Platform.runLater(() -> mainWindow.showStartupWarning(message));
+    }
 
 }

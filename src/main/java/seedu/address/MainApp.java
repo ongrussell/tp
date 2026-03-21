@@ -2,6 +2,8 @@ package seedu.address;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -36,15 +38,16 @@ import seedu.address.ui.UiManager;
  */
 public class MainApp extends Application {
 
-    public static final Version VERSION = new Version(0, 2, 2, true);
+    public static final Version VERSION = new Version(1, 3, 0, true);
 
     private static final Logger logger = LogsCenter.getLogger(MainApp.class);
-
     protected Ui ui;
     protected Logic logic;
     protected Storage storage;
     protected Model model;
     protected Config config;
+
+    private List<String> startUpWarnings = new ArrayList<>();
 
     @Override
     public void init() throws Exception {
@@ -68,9 +71,12 @@ public class MainApp extends Application {
     }
 
     /**
-     * Returns a {@code ModelManager} with the data from {@code storage}'s address book and {@code userPrefs}. <br>
-     * The data from the sample address book will be used instead if {@code storage}'s address book is not found,
-     * or an empty address book will be used instead if errors occur when reading {@code storage}'s address book.
+     * Initializes the ModelManager with data from the storage.
+     * Collects warnings from the storage (if available) and prepares them for display.
+     *
+     * @param storage The storage component where data is loaded from.
+     * @param userPrefs The user preferences for the application.
+     * @return A ModelManager with the loaded data.
      */
     private Model initModelManager(Storage storage, ReadOnlyUserPrefs userPrefs) {
         logger.info("Using data file : " + storage.getAddressBookFilePath());
@@ -84,10 +90,20 @@ public class MainApp extends Application {
                         + " populated with a sample AddressBook.");
             }
             initialData = addressBookOptional.orElseGet(SampleDataUtil::getSampleAddressBook);
+            if (storage instanceof StorageManager sm) {
+                List<String> warnings = sm.getLastLoadWarnings();
+                if (!warnings.isEmpty()) {
+                    startupWarnings.add("Warning: Some contacts were skipped due to invalid data in the save file:");
+                    startupWarnings.addAll(warnings);
+                }
+            }
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getAddressBookFilePath() + " could not be loaded."
                     + " Will be starting with an empty AddressBook.");
             initialData = new AddressBook();
+            startupWarnings.add("WARNING: Save file at " + storage.getAddressBookFilePath()
+                    + " could not be loaded and has been replaced with an empty address book."
+                    + " Your previous data may be corrupted.");
         }
 
         return new ModelManager(initialData, userPrefs);
@@ -172,6 +188,11 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         logger.info("Starting AddressBook " + MainApp.VERSION);
         ui.start(primaryStage);
+
+        if (!startUpWarnings.isEmpty()) {
+            String warningMessage = String.join("\n", startUpWarnings);
+            ((UiManager) ui).showStartUpWarning(warningMessage);
+        }
     }
 
     @Override

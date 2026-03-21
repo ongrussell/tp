@@ -4,6 +4,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -15,7 +18,8 @@ import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.ReadOnlyAddressBook;
 
 /**
- * A class to access AddressBook data stored as a json file on the hard disk.
+ * A class to access app data stored as a JSON file on the hard disk.
+ * Stores warnings encountered during the loading process and provides them to other components.
  */
 public class JsonAddressBookStorage implements AddressBookStorage {
 
@@ -23,12 +27,28 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
     private Path filePath;
 
+    private List<String> lastLoadWarnings = new ArrayList<>();
+
     public JsonAddressBookStorage(Path filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Returns the path where the app file is stored.
+     *
+     * @return The path to the app file.
+     */
     public Path getAddressBookFilePath() {
         return filePath;
+    }
+
+    /**
+     * Returns a list of warnings encountered during the last reading of the app.
+     *
+     * @return An unmodifiable list of warnings encountered during the last load operation.
+     */
+    public List<String> getLastLoadWarnings() {
+        return Collections.unmodifiableList(lastLoadWarnings);
     }
 
     @Override
@@ -45,14 +65,18 @@ public class JsonAddressBookStorage implements AddressBookStorage {
     public Optional<ReadOnlyAddressBook> readAddressBook(Path filePath) throws DataLoadingException {
         requireNonNull(filePath);
 
+        lastLoadWarnings = new ArrayList<>();
+
         Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
                 filePath, JsonSerializableAddressBook.class);
         if (!jsonAddressBook.isPresent()) {
             return Optional.empty();
         }
-
         try {
-            return Optional.of(jsonAddressBook.get().toModelType());
+            JsonSerializableAddressBook serializable = jsonAddressBook.get();
+            ReadOnlyAddressBook result = serializable.toModelType();
+            lastLoadWarnings.addAll(serializable.getLoadWarnings());
+            return Optional.of(result);
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);
