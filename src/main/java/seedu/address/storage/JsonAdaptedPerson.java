@@ -150,7 +150,7 @@ class JsonAdaptedPerson {
         if (email == null) {
             validationErrors.add(String.format(MISSING_FIELD_MESSAGE_FORMAT, Email.class.getSimpleName()));
         } else if (!Email.isValidEmail(email)) {
-            validationErrors.add(Email.INVALID_EMAIL_FORMAT);
+            validationErrors.add(Email.getDiagnosticMessage(email));
         }
 
         if (matricNumber == null) {

@@ -69,6 +69,27 @@ public class UiManagerTest {
         assertTrue(result.contains("You can fix these entries directly in the save file: dummy.json"));
     }
 
+    @Test
+    public void buildWarningList_multilineWarnings_separatesContactsWithBlankLine() {
+        Logic logicStub = new LogicStub(2);
+        UiManager uiManager = new UiManager(logicStub, List.of());
+
+        List<String> warnings = List.of(
+                "Skipped invalid contact 'Alice':\n- invalid email\n- invalid matric number",
+                "Skipped invalid contact 'Bob':\n- invalid phone"
+        );
+
+        String result = uiManager.buildWarningList(warnings);
+
+        String expected = "1. Skipped invalid contact 'Alice':\n"
+                + "- invalid email\n"
+                + "- invalid matric number\n\n"
+                + "2. Skipped invalid contact 'Bob':\n"
+                + "- invalid phone\n";
+
+        assertEquals(expected, result);
+    }
+
     /**
      * A stub class to isolate UiManager string testing from the rest of the application.
      * It provides hardcoded, predictable data for testing.

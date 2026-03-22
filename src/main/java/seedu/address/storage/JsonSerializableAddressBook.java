@@ -143,9 +143,10 @@ class JsonSerializableAddressBook {
             addressBook.addPerson(person);
         } catch (IllegalValueException | JsonProcessingException e) {
             String identifier = getRawPersonIdentifier(rawPersonNode, index);
-            logger.warning("Skipping invalid contact " + identifier + ": " + e.getMessage());
+            String formattedWarning = formatInvalidContactWarning(identifier, e.getMessage());
+            logger.warning(formattedWarning);
             preservedSkippedPersons.add(rawPersonNode.deepCopy());
-            loadWarnings.add("Skipped invalid contact " + identifier + ": " + e.getMessage());
+            loadWarnings.add(formattedWarning);
         }
     }
 
@@ -174,6 +175,20 @@ class JsonSerializableAddressBook {
             }
             addressBook.addClassSpace(classSpace);
         }
+    }
+
+    private String formatInvalidContactWarning(String identifier, String errorMessage) {
+        String[] errors = errorMessage.split(";\\s*");
+
+        StringBuilder sb = new StringBuilder("Skipped invalid contact ")
+                .append(identifier)
+                .append(":\n");
+
+        for (String error : errors) {
+            sb.append("- ").append(error).append("\n");
+        }
+
+        return sb.toString().trim();
     }
 
 }

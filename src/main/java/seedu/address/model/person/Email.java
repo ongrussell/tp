@@ -12,9 +12,6 @@ import seedu.address.commons.core.LogsCenter;
  * Guarantees: immutable; is valid as declared in {@link #isValidEmail(String)}
  */
 public class Email {
-    public static final String INVALID_EMAIL_FORMAT = "Invalid email format.";
-
-
     public static final String MULTIPLE_AT_SYMBOL_MESSAGE = "Email contains more than one '@'. "
             + "There should only be one.";
     public static final String MESSAGE_MISSING_LOCAL_PART = "Email is missing a local-part before '@'. "

@@ -152,7 +152,7 @@ public class JsonAdaptedPersonTest {
         JsonAdaptedPerson person = new JsonAdaptedPerson(
                 VALID_NAME, VALID_PHONE, INVALID_EMAIL, "A1234567A", VALID_TAGS);
 
-        String expectedMessage = Email.INVALID_EMAIL_FORMAT + "; "
+        String expectedMessage = Email.getDiagnosticMessage(INVALID_EMAIL) + "; "
                 + String.format(MatricNumber.MESSAGE_INVALID_CHECKSUM, 'X');
 
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);

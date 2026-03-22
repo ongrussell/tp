@@ -91,7 +91,12 @@ public class UiManager implements Ui {
     String buildWarningList(List<String> warnings) {
         StringBuilder list = new StringBuilder();
         for (int i = 0; i < warnings.size(); i++) {
-            list.append(i + 1).append(". ").append(warnings.get(i)).append("\n");
+            list.append(i + 1).append(". ").append(warnings.get(i));
+            if (i < warnings.size() - 1) {
+                list.append("\n\n");
+            } else {
+                list.append("\n");
+            }
         }
         return list.toString();
     }
