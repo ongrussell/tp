@@ -16,5 +16,9 @@ public class CliSyntax {
     public static final Prefix PREFIX_DATE = new Prefix("d/");
     public static final Prefix PREFIX_NEW_NAME = new Prefix("new/");
     public static final Prefix PREFIX_PARTICIPATION = new Prefix("pv/");
+    public static final Prefix PREFIX_ASSIGNMENT = new Prefix("a/");
+    public static final Prefix PREFIX_NEW_ASSIGNMENT = new Prefix("na/");
+    public static final Prefix PREFIX_MAX_MARKS = new Prefix("mm/");
+    public static final Prefix PREFIX_GRADE = new Prefix("gr/");
 
 }
