@@ -16,11 +16,14 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.ClearCommand;
+import seedu.address.logic.commands.CreateAssignmentCommand;
+import seedu.address.logic.commands.DeleteAssignmentCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
+import seedu.address.logic.commands.GradeAssignmentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -76,6 +79,25 @@ public class AddressBookParserTest {
         FindCommand command = (FindCommand) parser.parseCommand(
                 FindCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
         assertEquals(new FindCommand(new NameContainsKeywordsPredicate(keywords)), command);
+    }
+
+
+    @Test
+    public void parseCommand_createAssignmentAlias() throws Exception {
+        assertTrue(parser.parseCommand(CreateAssignmentCommand.SHORT_COMMAND_WORD
+                + " a/Quiz 1 d/2026-04-05 mm/20") instanceof CreateAssignmentCommand);
+    }
+
+    @Test
+    public void parseCommand_gradeAssignmentAlias() throws Exception {
+        assertTrue(parser.parseCommand(GradeAssignmentCommand.SHORT_COMMAND_WORD
+                + " a/Quiz 1 i/1 gr/17") instanceof GradeAssignmentCommand);
+    }
+
+    @Test
+    public void parseCommand_deleteAssignmentAlias() throws Exception {
+        assertTrue(parser.parseCommand(DeleteAssignmentCommand.SHORT_COMMAND_WORD
+                + " a/Quiz 1") instanceof DeleteAssignmentCommand);
     }
 
     @Test

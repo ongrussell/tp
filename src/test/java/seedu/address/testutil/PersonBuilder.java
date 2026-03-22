@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
@@ -40,6 +41,7 @@ public class PersonBuilder {
     private Attendance attendance;
     private Participation participation;
     private Map<ClassSpaceName, SessionList> classSpaceSessions;
+    private Map<ClassSpaceName, Map<AssignmentName, Integer>> assignmentGrades;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -54,6 +56,7 @@ public class PersonBuilder {
         attendance = new Attendance(Attendance.Status.UNINITIALISED);
         participation = new Participation(0);
         classSpaceSessions = new HashMap<>();
+        assignmentGrades = new HashMap<>();
     }
 
     /**
@@ -69,6 +72,9 @@ public class PersonBuilder {
         attendance = personToCopy.getAttendance();
         participation = personToCopy.getParticipation();
         classSpaceSessions = new HashMap<>(personToCopy.getClassSpaceSessions());
+        assignmentGrades = new HashMap<>();
+        personToCopy.getAssignmentGrades().forEach((classSpaceName, gradeMap) ->
+                assignmentGrades.put(classSpaceName, new HashMap<>(gradeMap)));
     }
 
     /**
@@ -136,6 +142,18 @@ public class PersonBuilder {
         return this;
     }
 
+
+    /**
+     * Adds or overwrites an assignment grade for the specified class space and assignment.
+     */
+    public PersonBuilder withAssignmentGrade(String classSpaceName, String assignmentName, int grade) {
+        ClassSpaceName parsedClassSpaceName = new ClassSpaceName(classSpaceName);
+        classSpaces.add(parsedClassSpaceName);
+        Map<AssignmentName, Integer> classGrades = assignmentGrades.getOrDefault(parsedClassSpaceName, new HashMap<>());
+        classGrades.put(new AssignmentName(assignmentName), grade);
+        assignmentGrades.put(parsedClassSpaceName, classGrades);
+        return this;
+    }
     /**
      * Sets the {@code Phone} of the {@code Person} that we are building.
      */
@@ -162,6 +180,7 @@ public class PersonBuilder {
         person = new Person(person, attendance);
         person = new Person(person, participation);
         person = new Person(person, classSpaceSessions);
+        person = new Person(person, assignmentGrades, true);
         return person;
     }
 

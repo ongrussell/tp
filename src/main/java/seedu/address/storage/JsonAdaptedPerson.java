@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
@@ -40,6 +41,7 @@ class JsonAdaptedPerson {
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
     private final List<String> classSpaces = new ArrayList<>();
     private final Map<String, List<JsonAdaptedSession>> classSpaceSessions = new HashMap<>();
+    private final Map<String, Map<String, Integer>> assignmentGrades = new HashMap<>();
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
@@ -51,7 +53,8 @@ class JsonAdaptedPerson {
             @JsonProperty("participation") Integer participation,
             @JsonProperty("tags") List<JsonAdaptedTag> tags,
             @JsonProperty("classSpaces") List<String> classSpaces,
-            @JsonProperty("classSpaceSessions") Map<String, List<JsonAdaptedSession>> classSpaceSessions) {
+            @JsonProperty("classSpaceSessions") Map<String, List<JsonAdaptedSession>> classSpaceSessions,
+            @JsonProperty("assignmentGrades") Map<String, Map<String, Integer>> assignmentGrades) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -72,11 +75,26 @@ class JsonAdaptedPerson {
                 this.classSpaceSessions.put(classSpaceName, adaptedSessions);
             });
         }
+        if (assignmentGrades != null) {
+            assignmentGrades.forEach((classSpaceName, grades) -> {
+                Map<String, Integer> adaptedGrades = grades == null ? new HashMap<>() : new HashMap<>(grades);
+                this.assignmentGrades.put(classSpaceName, adaptedGrades);
+            });
+        }
+    }
+
+    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
+                             String attendance, Integer participation,
+                             List<JsonAdaptedTag> tags, List<String> classSpaces,
+                             Map<String, List<JsonAdaptedSession>> classSpaceSessions) {
+        this(name, phone, email, matricNumber, attendance, participation,
+                tags, classSpaces, classSpaceSessions, null);
     }
 
     public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
                              List<JsonAdaptedTag> tags) {
-        this(name, phone, email, matricNumber, null, null, tags, null, null);
+        this(name, phone, email, matricNumber, null,
+                null, tags, null, null, null);
     }
 
     /**
@@ -96,10 +114,17 @@ class JsonAdaptedPerson {
                 .map(classSpaceName -> classSpaceName.value)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList());
-        source.getClassSpaceSessions().forEach((classSpaceName, sessionList) -> classSpaceSessions.put(
+        source.getClassSpaceSessions().forEach((classSpaceName,
+                                                sessionList) -> classSpaceSessions.put(
                 classSpaceName.value,
                 sessionList.getSessions().stream().map(JsonAdaptedSession::new).toList()
         ));
+        source.getAssignmentGrades().forEach((classSpaceName, gradeMap) ->
+                assignmentGrades.put(classSpaceName.value,
+                        gradeMap.entrySet().stream()
+                                .collect(HashMap::new, (
+                                        map, entry) -> map.put(entry.getKey().value, entry.getValue()),
+                                        HashMap::putAll)));
     }
 
     /**
@@ -176,7 +201,6 @@ class JsonAdaptedPerson {
         for (String classSpace : classSpaces) {
             modelClassSpaces.add(new ClassSpaceName(classSpace));
         }
-
         final Attendance modelAttendance;
         if (attendance == null) {
             modelAttendance = new Attendance(Attendance.Status.UNINITIALISED);
@@ -199,6 +223,7 @@ class JsonAdaptedPerson {
         person = new Person(person, modelAttendance);
         person = new Person(person, modelParticipation);
         person = new Person(person, parseClassSpaceSessions());
+        person = new Person(person, parseAssignmentGrades(), true);
         return person;
     }
 
@@ -218,6 +243,32 @@ class JsonAdaptedPerson {
             modelSessionMap.put(classSpaceName, new SessionList(sessions));
         }
         return modelSessionMap;
+    }
+
+    private Map<ClassSpaceName, Map<AssignmentName, Integer>> parseAssignmentGrades() throws IllegalValueException {
+        Map<ClassSpaceName, Map<AssignmentName, Integer>> modelAssignmentGrades = new HashMap<>();
+        for (Map.Entry<String, Map<String, Integer>> entry : assignmentGrades.entrySet()) {
+            String classSpaceNameString = entry.getKey();
+            if (!ClassSpaceName.isValidClassSpaceName(classSpaceNameString)) {
+                throw new IllegalValueException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+            }
+            ClassSpaceName classSpaceName = new ClassSpaceName(classSpaceNameString);
+            Map<AssignmentName, Integer> classGrades = new HashMap<>();
+            Map<String, Integer> storedGrades = entry.getValue() == null ? Map.of() : entry.getValue();
+            for (Map.Entry<String, Integer> gradeEntry : storedGrades.entrySet()) {
+                String assignmentNameString = gradeEntry.getKey();
+                Integer gradeValue = gradeEntry.getValue();
+                if (!AssignmentName.isValidAssignmentName(assignmentNameString)) {
+                    throw new IllegalValueException(AssignmentName.MESSAGE_CONSTRAINTS);
+                }
+                if (gradeValue == null || gradeValue < 0) {
+                    throw new IllegalValueException("Assignment grades should be non-negative integers.");
+                }
+                classGrades.put(new AssignmentName(assignmentNameString), gradeValue);
+            }
+            modelAssignmentGrades.put(classSpaceName, classGrades);
+        }
+        return modelAssignmentGrades;
     }
 }
 

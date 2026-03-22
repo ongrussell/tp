@@ -364,3 +364,24 @@
     -fx-background-radius: 2;
     -fx-font-size: 11;
 }
+
+#assignments {
+    -fx-hgap: 7;
+    -fx-vgap: 3;
+}
+
+.assignment-chip {
+    -fx-text-fill: white;
+    -fx-padding: 1 3 1 3;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+    -fx-font-size: 11;
+}
+
+.assignment-chip-ungraded {
+    -fx-background-color: #c94c4c;
+}
+
+.assignment-chip-graded {
+    -fx-background-color: #4c9f50;
+}

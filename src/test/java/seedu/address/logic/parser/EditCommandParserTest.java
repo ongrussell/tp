@@ -3,6 +3,7 @@ package seedu.address.logic.parser;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.commands.CommandTestUtil.EMAIL_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.EMAIL_DESC_BOB;
+import static seedu.address.logic.commands.CommandTestUtil.INVALID_EMAIL;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_EMAIL_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_MATRIC_NUMBER_DESC;
 import static seedu.address.logic.commands.CommandTestUtil.INVALID_NAME_DESC;
@@ -92,7 +93,8 @@ public class EditCommandParserTest {
     public void parse_invalidValue_failure() {
         assertParseFailure(parser, INDEX_FIRST + INVALID_NAME_DESC, Name.MESSAGE_CONSTRAINTS); // invalid name
         assertParseFailure(parser, INDEX_FIRST + INVALID_PHONE_DESC, Phone.MESSAGE_CONSTRAINTS); // invalid phone
-        assertParseFailure(parser, INDEX_FIRST + INVALID_EMAIL_DESC, Email.MESSAGE_CONSTRAINTS); // invalid email
+        assertParseFailure(parser, INDEX_FIRST + INVALID_EMAIL_DESC,
+                Email.getDiagnosticMessage(INVALID_EMAIL)); // invalid email
         assertParseFailure(parser, INDEX_FIRST + INVALID_MATRIC_NUMBER_DESC,
                 MatricNumber.MESSAGE_CONSTRAINTS); // invalid matriculation number
         assertParseFailure(parser, INDEX_FIRST + INVALID_TAG_DESC, Tag.MESSAGE_CONSTRAINTS); // invalid tag

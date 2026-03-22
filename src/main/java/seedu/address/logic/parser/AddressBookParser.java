@@ -13,13 +13,18 @@ import seedu.address.logic.commands.AddToGroupCommand;
 import seedu.address.logic.commands.AttViewCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
+import seedu.address.logic.commands.CreateAssignmentCommand;
 import seedu.address.logic.commands.CreateGroupCommand;
+import seedu.address.logic.commands.DeleteAssignmentCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.DeleteGroupCommand;
+import seedu.address.logic.commands.EditAssignmentCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
+import seedu.address.logic.commands.GradeAssignmentCommand;
 import seedu.address.logic.commands.HelpCommand;
+import seedu.address.logic.commands.ListAssignmentsCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.ListGroupsCommand;
 import seedu.address.logic.commands.MarkCommand;
@@ -81,6 +86,26 @@ public class AddressBookParser {
 
         case ListCommand.COMMAND_WORD:
             return new ListCommand();
+
+        case CreateAssignmentCommand.COMMAND_WORD:
+        case CreateAssignmentCommand.SHORT_COMMAND_WORD:
+            return new CreateAssignmentCommandParser().parse(arguments);
+
+        case ListAssignmentsCommand.COMMAND_WORD:
+        case ListAssignmentsCommand.SHORT_COMMAND_WORD:
+            return new ListAssignmentsCommandParser().parse(arguments);
+
+        case GradeAssignmentCommand.COMMAND_WORD:
+        case GradeAssignmentCommand.SHORT_COMMAND_WORD:
+            return new GradeAssignmentCommandParser().parse(arguments);
+
+        case EditAssignmentCommand.COMMAND_WORD:
+        case EditAssignmentCommand.SHORT_COMMAND_WORD:
+            return new EditAssignmentCommandParser().parse(arguments);
+
+        case DeleteAssignmentCommand.COMMAND_WORD:
+        case DeleteAssignmentCommand.SHORT_COMMAND_WORD:
+            return new DeleteAssignmentCommandParser().parse(arguments);
 
         case CreateGroupCommand.COMMAND_WORD:
             return new CreateGroupCommandParser().parse(arguments);

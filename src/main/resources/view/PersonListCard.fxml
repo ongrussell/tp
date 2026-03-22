@@ -28,6 +28,7 @@
       </HBox>
       <FlowPane fx:id="tags" />
       <FlowPane fx:id="groups" />
+      <FlowPane fx:id="assignments" />
       <Label fx:id="attendance" styleClass="attendance_label" text="$attendance" />
       <Label fx:id="participation" styleClass="participation_label" text="$participation" />
       <Label fx:id="phone" styleClass="cell_small_label" text="$phone" />

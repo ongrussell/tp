@@ -93,7 +93,9 @@ public class JsonAdaptedPersonTest {
     public void toModelType_invalidEmail_throwsIllegalValueException() {
         JsonAdaptedPerson person =
                 new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, INVALID_EMAIL, VALID_MATRIC_NUMBER, VALID_TAGS);
-        String expectedMessage = Email.INVALID_EMAIL_FORMAT;
+
+        String expectedMessage = Email.getDiagnosticMessage(INVALID_EMAIL);
+
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 
