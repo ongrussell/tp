@@ -100,17 +100,9 @@ public class UiManagerTest {
      */
     private static class LogicStub implements Logic {
 
-        private static final String[] VALID_MATRIC_NUMBERS = {
-                "A0123456J",
-                "A1234567X",
-                "A7654321J",
-                "A0000067Y",
-                "A4567891E",
-                "A0000002W",
-                "A1111111M",
-                "A0408987E",
-                "A1002345X",
-                "A0304556E"
+        private static final String[] VALID_MATRIC_NUMBERS = { "A0123456J", "A1234567X", "A7654321J", "A0000067Y",
+                                                               "A4567891E", "A0000002W", "A1111111M", "A0408987E",
+                                                               "A1002345X", "A0304556E"
         };
 
         private final ReadOnlyAddressBook addressBook;

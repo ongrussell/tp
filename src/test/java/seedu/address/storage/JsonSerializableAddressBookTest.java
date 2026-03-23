@@ -2,7 +2,6 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static seedu.address.testutil.Assert.assertThrows;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.person.Email;
@@ -45,6 +43,14 @@ public class JsonSerializableAddressBookTest {
             TEST_DATA_FOLDER.resolve("gradeAtMaxMarksAddressBook.json");
     private static final Path NEGATIVE_MAX_MARKS_FILE =
             TEST_DATA_FOLDER.resolve("negativeMaxMarksAddressBook.json");
+    private static final Path GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE =
+            TEST_DATA_FOLDER.resolve("gradeForNonMemberClassSpaceAddressBook.json");
+    private static final Path GRADE_FOR_NON_EXISTENT_ASSIGNMENT_FILE =
+            TEST_DATA_FOLDER.resolve("gradeForNonExistentAssignmentAddressBook.json");
+    private static final Path SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE =
+            TEST_DATA_FOLDER.resolve("sessionForNonMemberClassSpaceAddressBook.json");
+    private static final Path VALID_GRADES_AND_SESSIONS_FILE =
+            TEST_DATA_FOLDER.resolve("validGradesAndSessionsAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -264,6 +270,92 @@ public class JsonSerializableAddressBookTest {
         assertEquals(1, dataFromFile.getLoadWarnings().size());
         assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
     }
+
+    @Test
+    public void toModelType_gradeForNonMemberClassSpace_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(0, addressBookFromFile.getPersonList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid contact"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("not a member of it"));
+    }
+
+    @Test
+    public void toModelType_gradeForNonMemberClassSpace_warningMentionsClassSpace() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("T01"));
+    }
+
+    @Test
+    public void toModelType_gradeForNonExistentAssignment_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_EXISTENT_ASSIGNMENT_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(0, addressBookFromFile.getPersonList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid contact"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("does not exist"));
+    }
+
+    @Test
+    public void toModelType_gradeForNonExistentAssignment_warningMentionsAssignmentAndClassSpace() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_EXISTENT_ASSIGNMENT_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        String warning = dataFromFile.getLoadWarnings().get(0);
+        assertTrue(warning.contains("NonExistentAssignment"));
+        assertTrue(warning.contains("T01"));
+    }
+
+    @Test
+    public void toModelType_sessionForNonMemberClassSpace_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(0, addressBookFromFile.getPersonList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid contact"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("not a member of it"));
+    }
+
+    @Test
+    public void toModelType_sessionForNonMemberClassSpace_warningMentionsClassSpace() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("T01"));
+    }
+
+    @Test
+    public void toModelType_validGradesAndSessions_loadsPersonSuccessfully() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(VALID_GRADES_AND_SESSIONS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(1, addressBookFromFile.getPersonList().size());
+        assertEquals(0, dataFromFile.getLoadWarnings().size());
+    }
+
 
     /**
      * Helper method to read JSON file and assert that it produces "missing name" warning.

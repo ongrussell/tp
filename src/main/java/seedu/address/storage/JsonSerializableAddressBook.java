@@ -173,6 +173,7 @@ class JsonSerializableAddressBook {
             }
             ensureClassSpacesExist(addressBook, person);
             validateAssignmentGrades(addressBook, person);
+            validateClassSpaceSessions(addressBook, person);
             addressBook.addPerson(person);
         } catch (IllegalValueException | JsonProcessingException e) {
             skipInvalidPerson(rawPersonNode, index, e.getMessage());
@@ -199,6 +200,8 @@ class JsonSerializableAddressBook {
             ClassSpaceName classSpaceName = classSpaceEntry.getKey();
             Map<AssignmentName, Integer> grades = classSpaceEntry.getValue();
 
+            validatePersonIsMemberOfClassSpace(person, classSpaceName);
+
             ClassSpace classSpace = addressBook.getClassSpaceList().stream()
                     .filter(cs -> cs.getClassSpaceName().equals(classSpaceName))
                     .findFirst()
@@ -208,20 +211,47 @@ class JsonSerializableAddressBook {
                 continue;
             }
 
-            for (var gradeEntry : grades.entrySet()) {
-                AssignmentName assignmentName = gradeEntry.getKey();
-                int grade = gradeEntry.getValue();
+            validateGradesAgainstClassSpace(classSpace, classSpaceName, grades);
+        }
+    }
 
-                for (Assignment assignment : classSpace.getAssignments()) {
-                    if (assignment.getAssignmentName().equals(assignmentName)) {
-                        if (grade > assignment.getMaxMarks()) {
-                            throw new IllegalValueException(String.format(
-                                    "Grade %d for assignment '%s' in class space '%s' exceeds max marks of %d.",
-                                    grade, assignmentName.value, classSpaceName.value, assignment.getMaxMarks()));
-                        }
-                        break;
-                    }
-                }
+    private void validatePersonIsMemberOfClassSpace(Person person, ClassSpaceName classSpaceName)
+            throws IllegalValueException {
+        if (!person.getClassSpaces().contains(classSpaceName)) {
+            throw new IllegalValueException(String.format(
+                    "Person has grades for class space '%s' but is not a member of it.",
+                    classSpaceName.value));
+        }
+    }
+
+    private void validateGradesAgainstClassSpace(ClassSpace classSpace, ClassSpaceName classSpaceName,
+                                                 Map<AssignmentName, Integer> grades) throws IllegalValueException {
+        for (var gradeEntry : grades.entrySet()) {
+            AssignmentName assignmentName = gradeEntry.getKey();
+            int grade = gradeEntry.getValue();
+
+            if (!classSpace.hasAssignment(assignmentName)) {
+                throw new IllegalValueException(String.format(
+                        "Person has a grade for assignment '%s' in class space '%s',"
+                                + "but that assignment does not exist.",
+                        assignmentName.value, classSpaceName.value));
+            }
+
+            Assignment assignment = classSpace.findAssignmentByName(assignmentName).get();
+            if (grade > assignment.getMaxMarks()) {
+                throw new IllegalValueException(String.format(
+                        "Grade %d for assignment '%s' in class space '%s' exceeds max marks of %d.",
+                        grade, assignmentName.value, classSpaceName.value, assignment.getMaxMarks()));
+            }
+        }
+    }
+
+    private void validateClassSpaceSessions(AddressBook addressBook, Person person) throws IllegalValueException {
+        for (ClassSpaceName classSpaceName : person.getClassSpaceSessions().keySet()) {
+            if (!person.getClassSpaces().contains(classSpaceName)) {
+                throw new IllegalValueException(String.format(
+                        "Person has sessions for class space '%s' but is not a member of it.",
+                        classSpaceName.value));
             }
         }
     }
