@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,10 @@ import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.assignment.Assignment;
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Person;
 
 /**
@@ -164,20 +168,61 @@ class JsonSerializableAddressBook {
             JsonAdaptedPerson jsonAdaptedPerson = JsonUtil.fromJsonNode(rawPersonNode, JsonAdaptedPerson.class);
             Person person = jsonAdaptedPerson.toModelType();
             if (addressBook.hasPerson(person)) {
-                String identifier = person.getName().fullName + " (Matric: " + person.getMatricNumber().value + ")";
-                logger.warning("Skipping duplicate contact at entry #" + (index + 1) + ": " + identifier);
-                preservedSkippedPersons.add(rawPersonNode.deepCopy());
-                loadWarnings.add("Skipped duplicate contact: " + identifier);
+                skipDuplicatePerson(rawPersonNode, person, index);
                 return;
             }
             ensureClassSpacesExist(addressBook, person);
+            validateAssignmentGrades(addressBook, person);
             addressBook.addPerson(person);
         } catch (IllegalValueException | JsonProcessingException e) {
-            String identifier = getRawPersonIdentifier(rawPersonNode, index);
-            String formattedWarning = formatInvalidContactWarning(identifier, e.getMessage());
-            logger.warning(formattedWarning);
-            preservedSkippedPersons.add(rawPersonNode.deepCopy());
-            loadWarnings.add(formattedWarning);
+            skipInvalidPerson(rawPersonNode, index, e.getMessage());
+        }
+    }
+
+    private void skipDuplicatePerson(JsonNode rawPersonNode, Person person, int index) {
+        String identifier = person.getName().fullName + " (Matric: " + person.getMatricNumber().value + ")";
+        logger.warning("Skipping duplicate contact at entry #" + (index + 1) + ": " + identifier);
+        preservedSkippedPersons.add(rawPersonNode.deepCopy());
+        loadWarnings.add("Skipped duplicate contact: " + identifier);
+    }
+
+    private void skipInvalidPerson(JsonNode rawPersonNode, int index, String errorMessage) {
+        String identifier = getRawPersonIdentifier(rawPersonNode, index);
+        String formattedWarning = formatInvalidContactWarning(identifier, errorMessage);
+        logger.warning(formattedWarning);
+        preservedSkippedPersons.add(rawPersonNode.deepCopy());
+        loadWarnings.add(formattedWarning);
+    }
+
+    private void validateAssignmentGrades(AddressBook addressBook, Person person) throws IllegalValueException {
+        for (var classSpaceEntry : person.getAssignmentGrades().entrySet()) {
+            ClassSpaceName classSpaceName = classSpaceEntry.getKey();
+            Map<AssignmentName, Integer> grades = classSpaceEntry.getValue();
+
+            ClassSpace classSpace = addressBook.getClassSpaceList().stream()
+                    .filter(cs -> cs.getClassSpaceName().equals(classSpaceName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (classSpace == null) {
+                continue;
+            }
+
+            for (var gradeEntry : grades.entrySet()) {
+                AssignmentName assignmentName = gradeEntry.getKey();
+                int grade = gradeEntry.getValue();
+
+                for (Assignment assignment : classSpace.getAssignments()) {
+                    if (assignment.getAssignmentName().equals(assignmentName)) {
+                        if (grade > assignment.getMaxMarks()) {
+                            throw new IllegalValueException(String.format(
+                                    "Grade %d for assignment '%s' in class space '%s' exceeds max marks of %d.",
+                                    grade, assignmentName.value, classSpaceName.value, assignment.getMaxMarks()));
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 

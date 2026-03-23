@@ -39,6 +39,12 @@ public class JsonSerializableAddressBookTest {
             TEST_DATA_FOLDER.resolve("duplicateClassSpaceAddressBook.json");
     private static final Path INVALID_CLASS_SPACE_FILE =
             TEST_DATA_FOLDER.resolve("invalidClassSpaceAddressBook.json");
+    private static final Path GRADE_EXCEEDS_MAX_MARKS_FILE =
+            TEST_DATA_FOLDER.resolve("gradeExceedsMaxMarksAddressBook.json");
+    private static final Path GRADE_AT_MAX_MARKS_FILE =
+            TEST_DATA_FOLDER.resolve("gradeAtMaxMarksAddressBook.json");
+    private static final Path NEGATIVE_MAX_MARKS_FILE =
+            TEST_DATA_FOLDER.resolve("negativeMaxMarksAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -201,6 +207,60 @@ public class JsonSerializableAddressBookTest {
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
         assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
+    }
+
+    @Test
+    public void toModelType_gradeExceedsMaxMarks_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_EXCEEDS_MAX_MARKS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        // Person with invalid grade should be skipped
+        assertEquals(0, addressBookFromFile.getPersonList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid contact"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("exceeds max marks"));
+    }
+
+    @Test
+    public void toModelType_gradeExceedsMaxMarks_warningIncludesAssignmentAndClassSpaceDetails() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_EXCEEDS_MAX_MARKS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        String warning = dataFromFile.getLoadWarnings().get(0);
+        assertTrue(warning.contains("Quiz 1"), "Warning should mention the assignment name");
+        assertTrue(warning.contains("T01"), "Warning should mention the class space name");
+        assertTrue(warning.contains("105"), "Warning should mention the offending grade");
+        assertTrue(warning.contains("100"), "Warning should mention the max marks");
+    }
+
+    @Test
+    public void toModelType_gradeAtMaxMarks_loadsPersonSuccessfully() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_AT_MAX_MARKS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        // Grade equal to maxMarks is valid — person should be loaded
+        assertEquals(1, addressBookFromFile.getPersonList().size());
+        assertEquals(0, dataFromFile.getLoadWarnings().size());
+    }
+
+    @Test
+    public void toModelType_negativeMaxMarksAssignment_skipsClassSpaceAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(NEGATIVE_MAX_MARKS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(0, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
         assertEquals(1, dataFromFile.getLoadWarnings().size());
         assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
     }
