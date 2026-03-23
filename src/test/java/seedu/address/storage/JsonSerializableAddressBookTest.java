@@ -55,6 +55,8 @@ public class JsonSerializableAddressBookTest {
             TEST_DATA_FOLDER.resolve("preservedSkippedPersonsAddressBook.json");
     private static final Path PRESERVED_SKIPPED_CLASS_SPACES_FILE =
             TEST_DATA_FOLDER.resolve("preservedSkippedClassSpacesAddressBook.json");
+    private static final Path INVALID_ASSIGNMENT_NAME_FILE =
+            TEST_DATA_FOLDER.resolve("invalidAssignmentNameAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -438,6 +440,18 @@ public class JsonSerializableAddressBookTest {
                 .anyMatch(w -> w.contains("FakeAssignment"))); // warning preserved
     }
 
+    @Test
+    public void toModelType_assignmentWithSpecialCharacterName_skipsClassSpaceAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(INVALID_ASSIGNMENT_NAME_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(0, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
+    }
 
     /**
      * Helper method to read JSON file and assert that it produces "missing name" warning.

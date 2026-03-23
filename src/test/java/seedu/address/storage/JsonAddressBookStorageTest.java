@@ -228,4 +228,26 @@ public class JsonAddressBookStorageTest {
         String afterSaveContents = FileUtil.readFromFile(tempFilePath);
         assertEquals(originalContents, afterSaveContents);
     }
+
+    @Test
+    public void readAddressBook_illegalValueExceptionFile_setsSkipSaveFlag() throws Exception {
+        // brokenAddressBook.json is malformed JSON — triggers DataLoadingException not IllegalValueException.
+        // This test documents that after a fatal load failure, a subsequent save is skipped.
+        Path filePath = testFolder.resolve("TempAddressBook.json");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        // Write a valid file first so there is something to overwrite.
+        storage.saveAddressBook(getTypicalAddressBook());
+
+        // Overwrite with a broken file.
+        FileUtil.writeToFile(filePath, "not valid json");
+
+        // Load should fail.
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook(filePath));
+
+        // Save should be skipped --> the file should still contain the broken content.
+        storage.saveAddressBook(getTypicalAddressBook(), filePath);
+        String fileContent = java.nio.file.Files.readString(filePath);
+        assertEquals("not valid json", fileContent);
+    }
 }

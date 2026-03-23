@@ -218,16 +218,17 @@ class JsonSerializableAddressBook {
             Map<AssignmentName, Integer> grades = classSpaceEntry.getValue();
 
             validatePersonIsMemberOfClassSpace(person, classSpaceName);
-
+            /*
+            This should never be reached as ensureClassSpacesExist guarantees the class space
+            exists before this method is called. The orElseThrow is a defensive guard against
+            future errors in the load sequence.
+             */
             ClassSpace classSpace = addressBook.getClassSpaceList().stream()
                     .filter(cs -> cs.getClassSpaceName().equals(classSpaceName))
                     .findFirst()
-                    .orElse(null);
-
-            if (classSpace == null) {
-                continue;
-            }
-
+                    .orElseThrow(() ->
+                            new AssertionError("Class space '" + classSpaceName.value
+                                    + "' should exist after ensureClassSpacesExist"));
             validateGradesAgainstClassSpace(classSpace, classSpaceName, grades);
         }
     }

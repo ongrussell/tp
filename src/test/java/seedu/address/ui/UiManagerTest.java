@@ -1,6 +1,7 @@
 package seedu.address.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
@@ -93,6 +94,52 @@ public class UiManagerTest {
                 + "- invalid phone\n";
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void buildStartUpMessage_duplicateContactWarning_classifiedAsContactWarning() {
+        Logic logicStub = new LogicStub(1);
+        UiManager uiManager = new UiManager(logicStub, List.of());
+
+        List<String> warnings = List.of("Skipped duplicate contact 'Alice' (Matric: A1234567X)");
+        String result = uiManager.buildStartUpMessage(warnings);
+
+        assertTrue(result.contains("1 contact could not be loaded and was skipped:"));
+    }
+
+    @Test
+    public void buildStartUpMessage_duplicateClassSpaceWarning_classifiedAsClassSpaceWarning() {
+        Logic logicStub = new LogicStub(1);
+        UiManager uiManager = new UiManager(logicStub, List.of());
+
+        List<String> warnings = List.of("Skipped duplicate class space 'T01'");
+        String result = uiManager.buildStartUpMessage(warnings);
+
+        assertTrue(result.contains("1 class space could not be loaded and was skipped:"));
+    }
+
+    @Test
+    public void buildStartUpMessage_unrecognisedWarning_notIncludedInEitherSection() {
+        Logic logicStub = new LogicStub(1);
+        UiManager uiManager = new UiManager(logicStub, List.of());
+
+        // A warning that doesn't start with any known prefix should be silently ignored
+        List<String> warnings = List.of("Some unknown warning type");
+        String result = uiManager.buildStartUpMessage(warnings);
+
+        assertFalse(result.contains("could not be loaded"));
+    }
+
+    @Test
+    public void constructor_noWarnings_defaultsToEmptyStartupWarnings() {
+        // Tests the single-arg constructor: new UiManager(logic)
+        // which delegates to this(logic, List.of())
+        Logic logicStub = new LogicStub(3);
+        UiManager uiManager = new UiManager(logicStub);
+
+        // buildStartUpMessage with empty list should still produce the loaded count message
+        String result = uiManager.buildStartUpMessage(List.of());
+        assertEquals("3 contacts loaded successfully.", result);
     }
     /**
      * A stub class to isolate UiManager string testing from the rest of the application.

@@ -167,5 +167,43 @@ public class JsonAdaptedPersonTest {
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 
+    @Test
+    public void toModelType_invalidClassSpaceNameInGrades_throwsIllegalValueException() {
+        // Class space name key in assignmentGrades is invalid (empty string fails validation)
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                " ", Map.of("Assignment 1", 50) // invalid class space name
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidAssignmentNameInGrades_throwsIllegalValueException() {
+        // Assignment name key in grades is invalid (empty string fails validation)
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                "CS2103T-T01", Map.of(" ", 50) // invalid assignment name
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_negativeGradeValue_throwsIllegalValueException() {
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                "CS2103T-T01", Map.of("Assignment 1", -1)
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
 }
 
