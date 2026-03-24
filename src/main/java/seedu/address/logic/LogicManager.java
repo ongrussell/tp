@@ -19,7 +19,7 @@ import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 import seedu.address.storage.Storage;
 
@@ -82,8 +82,8 @@ public class LogicManager implements Logic {
     }
 
     @Override
-    public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
-        return model.activeClassSpaceNameProperty();
+    public ReadOnlyObjectProperty<GroupName> activeGroupNameProperty() {
+        return model.activeGroupNameProperty();
     }
 
     @Override

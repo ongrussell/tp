@@ -14,32 +14,32 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
 public class GradeAssignmentCommandTest {
 
-    private static final ClassSpaceName T01 = new ClassSpaceName("T01");
+    private static final GroupName T01 = new GroupName("T01");
 
     @Test
     public void execute_validIndexTarget_success() {
         Model model = new ModelManager();
         Group group = new Group(T01,
                 List.of(new Assignment(new AssignmentName("Quiz 1"), LocalDate.of(2026, 4, 5), 20)));
-        model.addClassSpace(group);
-        model.switchToClassSpaceView(T01);
+        model.addGroup(group);
+        model.switchToGroupView(T01);
 
         Person originalPerson = new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
-                .withEmail("alice@example.com").withPhone("91234567").withClassSpaces("T01").build();
+                .withEmail("alice@example.com").withPhone("91234567").withGroups("T01").build();
         model.addPerson(originalPerson);
 
         GradeAssignmentCommand command = GradeAssignmentCommand.forIndexes(new AssignmentName("Quiz 1"),
                 List.of(Index.fromOneBased(1)), 17);
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setPerson(originalPerson,
                 originalPerson.withUpdatedAssignmentGrade(T01, new AssignmentName("Quiz 1"), 17));
 
@@ -49,11 +49,11 @@ public class GradeAssignmentCommandTest {
     @Test
     public void execute_gradeAboveMaxMarks_failure() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01,
+        model.addGroup(new Group(T01,
                 List.of(new Assignment(new AssignmentName("Quiz 1"), LocalDate.of(2026, 4, 5), 20))));
-        model.switchToClassSpaceView(T01);
+        model.switchToGroupView(T01);
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
-                .withEmail("alice@example.com").withPhone("91234567").withClassSpaces("T01").build());
+                .withEmail("alice@example.com").withPhone("91234567").withGroups("T01").build());
 
         GradeAssignmentCommand command = GradeAssignmentCommand.forIndexes(new AssignmentName("Quiz 1"),
                 List.of(Index.fromOneBased(1)), 25);

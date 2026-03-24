@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
@@ -30,9 +30,9 @@ public class JsonAdaptedPersonTest {
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
     private static final String INVALID_ATTENDANCE = "LATE";
-    private static final String INVALID_CLASS_SPACE = " ";
+    private static final String INVALID_GROUP = " ";
     private static final int INVALID_PARTICIPATION = 999;
-    private static final Map<String, List<JsonAdaptedSession>> NULL_CLASS_SPACE_SESSIONS = null;
+    private static final Map<String, List<JsonAdaptedSession>> NULL_GROUP_SESSIONS = null;
 
     private static final String VALID_NAME = BENSON.getName().toString();
     private static final String VALID_PHONE = BENSON.getPhone().toString();
@@ -43,14 +43,14 @@ public class JsonAdaptedPersonTest {
             .collect(Collectors.toList());
     private static final String VALID_ATTENDANCE = Attendance.Status.PRESENT.name();
     private static final Integer VALID_PARTICIPATION = 4;
-    private static final List<String> VALID_CLASS_SPACES = Arrays.asList("CS2103T-T01", "CS2103T-T02");
+    private static final List<String> VALID_GROUPS = Arrays.asList("CS2103T-T01", "CS2103T-T02");
 
     @Test
     public void toModelType_validPersonDetails_returnsPerson() throws Exception {
         var sourcePerson = new PersonBuilder(BENSON)
                 .withAttendance(VALID_ATTENDANCE)
                 .withParticipation(VALID_PARTICIPATION)
-                .withClassSpaces("CS2103T-T01", "CS2103T-T02")
+                .withGroups("CS2103T-T01", "CS2103T-T02")
                 .build();
 
         JsonAdaptedPerson person = new JsonAdaptedPerson(sourcePerson);
@@ -134,16 +134,16 @@ public class JsonAdaptedPersonTest {
     @Test
     public void toModelType_invalidAttendance_throwsIllegalValueException() {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
-                INVALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS);
+                INVALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, VALID_GROUPS, NULL_GROUP_SESSIONS);
         assertThrows(IllegalValueException.class, Attendance.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
     @Test
-    public void toModelType_invalidClassSpace_throwsIllegalValueException() {
+    public void toModelType_invalidGroup_throwsIllegalValueException() {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
-                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, List.of(INVALID_CLASS_SPACE),
-                NULL_CLASS_SPACE_SESSIONS);
-        assertThrows(IllegalValueException.class, ClassSpaceName.MESSAGE_CONSTRAINTS, person::toModelType);
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, List.of(INVALID_GROUP),
+                NULL_GROUP_SESSIONS);
+        assertThrows(IllegalValueException.class, GroupName.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
     @Test
@@ -161,22 +161,22 @@ public class JsonAdaptedPersonTest {
     @Test
     public void toModelType_invalidParticipation_throwsIllegalValueException() {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
-                VALID_ATTENDANCE, INVALID_PARTICIPATION, VALID_TAGS, VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS);
+                VALID_ATTENDANCE, INVALID_PARTICIPATION, VALID_TAGS, VALID_GROUPS, NULL_GROUP_SESSIONS);
 
         String expectedMessage = Participation.MESSAGE_CONSTRAINTS;
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 
     @Test
-    public void toModelType_invalidClassSpaceNameInGrades_throwsIllegalValueException() {
-        // Class space name key in assignmentGrades is invalid (empty string fails validation)
+    public void toModelType_invalidGroupNameInGrades_throwsIllegalValueException() {
+        // Group name key in assignmentGrades is invalid (empty string fails validation)
         Map<String, Map<String, Integer>> invalidGrades = Map.of(
-                " ", Map.of("Assignment 1", 50) // invalid class space name
+                " ", Map.of("Assignment 1", 50) // invalid group name
         );
         JsonAdaptedPerson person = new JsonAdaptedPerson(
                 VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
                 VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
-                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+                VALID_GROUPS, NULL_GROUP_SESSIONS, invalidGrades);
         assertThrows(IllegalValueException.class, person::toModelType);
     }
 
@@ -189,7 +189,7 @@ public class JsonAdaptedPersonTest {
         JsonAdaptedPerson person = new JsonAdaptedPerson(
                 VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
                 VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
-                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+                VALID_GROUPS, NULL_GROUP_SESSIONS, invalidGrades);
         assertThrows(IllegalValueException.class, person::toModelType);
     }
 
@@ -201,9 +201,8 @@ public class JsonAdaptedPersonTest {
         JsonAdaptedPerson person = new JsonAdaptedPerson(
                 VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
                 VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
-                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+                VALID_GROUPS, NULL_GROUP_SESSIONS, invalidGrades);
         assertThrows(IllegalValueException.class, person::toModelType);
     }
 
 }
-

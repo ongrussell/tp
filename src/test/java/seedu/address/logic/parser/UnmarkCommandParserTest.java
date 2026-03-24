@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.UnmarkCommand;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 public class UnmarkCommandParserTest {
 
@@ -21,7 +21,7 @@ public class UnmarkCommandParserTest {
     public void parse_allFieldsPresent_success() {
         assertParseSuccess(parser, " i/1 d/2026-03-16 g/T01",
                 new UnmarkCommand(Index.fromOneBased(1), Optional.of(LocalDate.of(2026, 3, 16)),
-                        Optional.of(new ClassSpaceName("T01"))));
+                        Optional.of(new GroupName("T01"))));
     }
 
     @Test

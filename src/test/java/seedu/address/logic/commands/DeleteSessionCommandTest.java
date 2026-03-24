@@ -15,28 +15,28 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.testutil.PersonBuilder;
 
 public class DeleteSessionCommandTest {
-    private static final ClassSpaceName T01 = new ClassSpaceName("T01");
+    private static final GroupName T01 = new GroupName("T01");
     private static final LocalDate SESSION_DATE = LocalDate.of(2026, 3, 16);
     private static final LocalDate OTHER_DATE = LocalDate.of(2026, 3, 17);
 
     @Test
     public void execute_deletesSessionForCurrentGroup() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1)
                 .withSession("T01", OTHER_DATE.toString(), "ABSENT", 0).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withoutSession(T01, SESSION_DATE));
 
@@ -45,23 +45,23 @@ public class DeleteSessionCommandTest {
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
 
         assertFalse(model.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow()
-                .getClassSpaceSessions().get(T01).getSession(SESSION_DATE).isPresent());
+                .getGroupSessions().get(T01).getSession(SESSION_DATE).isPresent());
         assertTrue(model.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow()
-                .getClassSpaceSessions().get(T01).getSession(OTHER_DATE).isPresent());
+                .getGroupSessions().get(T01).getSession(OTHER_DATE).isPresent());
     }
 
     @Test
     public void execute_activeSessionDeleted_clearsActiveSessionDate() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.setActiveSessionDate(SESSION_DATE);
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withoutSession(T01, SESSION_DATE));
         expectedModel.clearActiveSessionDate();
@@ -76,8 +76,8 @@ public class DeleteSessionCommandTest {
     @Test
     public void execute_sessionMissing_throwsCommandException() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
 
         DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
         String expectedMessage = String.format(DeleteSessionCommand.MESSAGE_SESSION_NOT_FOUND, SESSION_DATE, T01);
@@ -88,7 +88,7 @@ public class DeleteSessionCommandTest {
     public void execute_noActiveGroup_throwsCommandException() {
         Model model = new ModelManager();
         DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE);
-        assertThrows(CommandException.class, DeleteSessionCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE, () -> {
+        assertThrows(CommandException.class, DeleteSessionCommand.MESSAGE_NO_ACTIVE_GROUP, () -> {
             command.execute(model);
         });
     }
@@ -111,7 +111,7 @@ public class DeleteSessionCommandTest {
     public void toStringMethod() {
         DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, T01);
         String expected = DeleteSessionCommand.class.getCanonicalName()
-                + "{sessionDate=" + SESSION_DATE + ", classSpaceName=Optional[" + T01 + "]}";
+                + "{sessionDate=" + SESSION_DATE + ", groupName=Optional[" + T01 + "]}";
         assertEquals(expected, command.toString());
     }
 }

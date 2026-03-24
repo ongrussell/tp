@@ -11,7 +11,7 @@ import java.util.Optional;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.UnmarkCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new UnmarkCommand object.
@@ -42,14 +42,14 @@ public class UnmarkCommandParser implements Parser<UnmarkCommand> {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
             }
 
-            Optional<ClassSpaceName> classSpaceName = Optional.empty();
+            Optional<GroupName> groupName = Optional.empty();
             if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-                classSpaceName = Optional.of(
-                        ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get())
+                groupName = Optional.of(
+                        ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get())
                 );
             }
 
-            return new UnmarkCommand(index, date, classSpaceName);
+            return new UnmarkCommand(index, date, groupName);
         } catch (ParseException e) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnmarkCommand.MESSAGE_USAGE), e);

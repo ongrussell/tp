@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
@@ -37,11 +37,11 @@ public class PersonBuilder {
     private Email email;
     private MatricNumber matricNumber;
     private Set<Tag> tags;
-    private Set<ClassSpaceName> classSpaces;
+    private Set<GroupName> groups;
     private Attendance attendance;
     private Participation participation;
-    private Map<ClassSpaceName, SessionList> classSpaceSessions;
-    private Map<ClassSpaceName, Map<AssignmentName, Integer>> assignmentGrades;
+    private Map<GroupName, SessionList> groupSessions;
+    private Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -52,10 +52,10 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         matricNumber = new MatricNumber(DEFAULT_MATRIC_NUMBER);
         tags = new HashSet<>();
-        classSpaces = new HashSet<>();
+        groups = new HashSet<>();
         attendance = new Attendance(Attendance.Status.UNINITIALISED);
         participation = new Participation(0);
-        classSpaceSessions = new HashMap<>();
+        groupSessions = new HashMap<>();
         assignmentGrades = new HashMap<>();
     }
 
@@ -68,13 +68,13 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         matricNumber = personToCopy.getMatricNumber();
         tags = new HashSet<>(personToCopy.getTags());
-        classSpaces = new HashSet<>(personToCopy.getClassSpaces());
+        groups = new HashSet<>(personToCopy.getGroups());
         attendance = personToCopy.getAttendance();
         participation = personToCopy.getParticipation();
-        classSpaceSessions = new HashMap<>(personToCopy.getClassSpaceSessions());
+        groupSessions = new HashMap<>(personToCopy.getGroupSessions());
         assignmentGrades = new HashMap<>();
-        personToCopy.getAssignmentGrades().forEach((classSpaceName, gradeMap) ->
-                assignmentGrades.put(classSpaceName, new HashMap<>(gradeMap)));
+        personToCopy.getAssignmentGrades().forEach((groupName, gradeMap) ->
+                assignmentGrades.put(groupName, new HashMap<>(gradeMap)));
     }
 
     /**
@@ -102,11 +102,11 @@ public class PersonBuilder {
     }
 
     /**
-     * Sets the {@code ClassSpaces} of the {@code Person} that we are building.
+     * Sets the {@code Groups} of the {@code Person} that we are building.
      */
-    public PersonBuilder withClassSpaces(String ... classSpaces) {
-        this.classSpaces = Stream.of(classSpaces)
-                .map(ClassSpaceName::new)
+    public PersonBuilder withGroups(String ... groups) {
+        this.groups = Stream.of(groups)
+                .map(GroupName::new)
                 .collect(Collectors.toSet());
         return this;
     }
@@ -128,30 +128,30 @@ public class PersonBuilder {
     }
 
     /**
-     * Adds or overwrites a session for the specified class space and date.
+     * Adds or overwrites a session for the specified group and date.
      */
-    public PersonBuilder withSession(String classSpaceName, String date, String attendance, int participation) {
-        ClassSpaceName parsedClassSpaceName = new ClassSpaceName(classSpaceName);
-        classSpaces.add(parsedClassSpaceName);
+    public PersonBuilder withSession(String groupName, String date, String attendance, int participation) {
+        GroupName parsedGroupName = new GroupName(groupName);
+        groups.add(parsedGroupName);
 
-        SessionList existingSessions = classSpaceSessions.getOrDefault(parsedClassSpaceName, new SessionList());
+        SessionList existingSessions = groupSessions.getOrDefault(parsedGroupName, new SessionList());
         SessionList updatedSessions = new SessionList(existingSessions.getSessions());
         updatedSessions.addSession(new Session(LocalDate.parse(date), new Attendance(attendance),
                 new Participation(participation)));
-        classSpaceSessions.put(parsedClassSpaceName, updatedSessions);
+        groupSessions.put(parsedGroupName, updatedSessions);
         return this;
     }
 
 
     /**
-     * Adds or overwrites an assignment grade for the specified class space and assignment.
+     * Adds or overwrites an assignment grade for the specified group and assignment.
      */
-    public PersonBuilder withAssignmentGrade(String classSpaceName, String assignmentName, int grade) {
-        ClassSpaceName parsedClassSpaceName = new ClassSpaceName(classSpaceName);
-        classSpaces.add(parsedClassSpaceName);
-        Map<AssignmentName, Integer> classGrades = assignmentGrades.getOrDefault(parsedClassSpaceName, new HashMap<>());
+    public PersonBuilder withAssignmentGrade(String groupName, String assignmentName, int grade) {
+        GroupName parsedGroupName = new GroupName(groupName);
+        groups.add(parsedGroupName);
+        Map<AssignmentName, Integer> classGrades = assignmentGrades.getOrDefault(parsedGroupName, new HashMap<>());
         classGrades.put(new AssignmentName(assignmentName), grade);
-        assignmentGrades.put(parsedClassSpaceName, classGrades);
+        assignmentGrades.put(parsedGroupName, classGrades);
         return this;
     }
     /**
@@ -176,10 +176,10 @@ public class PersonBuilder {
      * @return a new {@code Person} instance
      */
     public Person build() {
-        Person person = new Person(name, phone, email, matricNumber, classSpaces, tags);
+        Person person = new Person(name, phone, email, matricNumber, groups, tags);
         person = new Person(person, attendance);
         person = new Person(person, participation);
-        person = new Person(person, classSpaceSessions);
+        person = new Person(person, groupSessions);
         person = new Person(person, assignmentGrades, true);
         return person;
     }

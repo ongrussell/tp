@@ -13,11 +13,11 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
 import seedu.address.model.person.Person;
 
 /**
- * Edits an existing assignment in the current class space.
+ * Edits an existing assignment in the current group.
  */
 public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
 
@@ -25,7 +25,7 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
     public static final String SHORT_COMMAND_WORD = "edita";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + " (alias: " + SHORT_COMMAND_WORD + ")"
-            + ": Edits an existing assignment in the current class space.\n"
+            + ": Edits an existing assignment in the current group.\n"
             + "Parameters: a/ASSIGNMENT_NAME [na/NEW_ASSIGNMENT_NAME] [d/NEW_DUE_DATE] [mm/NEW_MAX_MARKS]\n"
             + "Example: " + SHORT_COMMAND_WORD + " a/Quiz 1 na/Quiz 1 Revised d/2026-04-08 mm/25";
 
@@ -49,7 +49,7 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Group activeGroup = getActiveClassSpace(model);
+        Group activeGroup = getActiveGroup(model);
         Assignment assignmentToEdit = getRequiredAssignment(activeGroup, targetAssignmentName);
         Assignment editedAssignment = createEditedAssignment(assignmentToEdit, editAssignmentDescriptor);
 
@@ -65,15 +65,15 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
         List<Assignment> updatedAssignments = new ArrayList<>(activeGroup.getAssignments());
         int index = updatedAssignments.indexOf(assignmentToEdit);
         updatedAssignments.set(index, editedAssignment);
-        Group updatedGroup = new Group(activeGroup.getClassSpaceName(), updatedAssignments);
-        model.setClassSpace(activeGroup, updatedGroup);
+        Group updatedGroup = new Group(activeGroup.getGroupName(), updatedAssignments);
+        model.setGroup(activeGroup, updatedGroup);
 
         if (!targetAssignmentName.equals(editedAssignment.getAssignmentName())) {
             for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
-                if (!person.hasClassSpace(activeGroup.getClassSpaceName())) {
+                if (!person.hasGroup(activeGroup.getGroupName())) {
                     continue;
                 }
-                Person updatedPerson = person.withRenamedAssignmentGrade(activeGroup.getClassSpaceName(),
+                Person updatedPerson = person.withRenamedAssignmentGrade(activeGroup.getGroupName(),
                         targetAssignmentName, editedAssignment.getAssignmentName());
                 if (!updatedPerson.equals(person)) {
                     model.setPerson(person, updatedPerson);
@@ -82,7 +82,7 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
         }
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, editedAssignment.getAssignmentName().value,
-                activeGroup.getClassSpaceName().value));
+                activeGroup.getGroupName().value));
     }
 
     private Assignment createEditedAssignment(Assignment assignmentToEdit,
@@ -95,8 +95,8 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
     }
 
     private int findHighestExistingGrade(Model model, Group activeGroup, AssignmentName assignmentName) {
-        return getStudentsInClass(model, activeGroup.getClassSpaceName()).stream()
-                .flatMap(person -> person.getAssignmentGrade(activeGroup.getClassSpaceName(),
+        return getStudentsInClass(model, activeGroup.getGroupName()).stream()
+                .flatMap(person -> person.getAssignmentGrade(activeGroup.getGroupName(),
                                 assignmentName)
                         .stream())
                 .max(Integer::compareTo)

@@ -19,8 +19,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
@@ -35,7 +35,7 @@ public class ModelManager implements Model {
     private final FilteredList<Person> filteredPersons;
     private final SimpleStringProperty currentView;
     private final SimpleBooleanProperty attendanceViewActive;
-    private final SimpleObjectProperty<ClassSpaceName> activeClassSpaceName;
+    private final SimpleObjectProperty<GroupName> activeGroupName;
     private final SimpleObjectProperty<LocalDate> activeSessionDate;
     private final SimpleObjectProperty<LocalDate> visibleSessionRangeStart;
     private final SimpleObjectProperty<LocalDate> visibleSessionRangeEnd;
@@ -55,7 +55,7 @@ public class ModelManager implements Model {
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         currentView = new SimpleStringProperty(ALL_STUDENTS_VIEW_NAME);
         attendanceViewActive = new SimpleBooleanProperty(false);
-        activeClassSpaceName = new SimpleObjectProperty<>();
+        activeGroupName = new SimpleObjectProperty<>();
         activeSessionDate = new SimpleObjectProperty<>();
         visibleSessionRangeStart = new SimpleObjectProperty<>();
         visibleSessionRangeEnd = new SimpleObjectProperty<>();
@@ -150,30 +150,30 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public boolean hasClassSpace(Group group) {
+    public boolean hasGroup(Group group) {
         requireNonNull(group);
-        return addressBook.hasClassSpace(group);
+        return addressBook.hasGroup(group);
     }
 
     @Override
-    public Optional<Group> findClassSpaceByName(ClassSpaceName classSpaceName) {
-        requireNonNull(classSpaceName);
-        return addressBook.getClassSpaceList().stream()
-                .filter(classSpace -> classSpace.getClassSpaceName().equals(classSpaceName))
+    public Optional<Group> findGroupByName(GroupName groupName) {
+        requireNonNull(groupName);
+        return addressBook.getGroupList().stream()
+                .filter(group -> group.getGroupName().equals(groupName))
                 .findFirst();
     }
 
     @Override
-    public void addClassSpace(Group group) {
+    public void addGroup(Group group) {
         requireNonNull(group);
-        addressBook.addClassSpace(group);
+        addressBook.addGroup(group);
     }
 
     @Override
-    public void deleteClassSpace(Group target) {
+    public void deleteGroup(Group target) {
         requireNonNull(target);
-        addressBook.removeClassSpace(target);
-        if (target.getClassSpaceName().equals(activeClassSpaceName.get())) {
+        addressBook.removeGroup(target);
+        if (target.getGroupName().equals(activeGroupName.get())) {
             switchToAllStudentsView();
             return;
         }
@@ -181,19 +181,19 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public void setClassSpace(Group target, Group editedGroup) {
+    public void setGroup(Group target, Group editedGroup) {
         requireAllNonNull(target, editedGroup);
-        addressBook.setClassSpace(target, editedGroup);
-        if (target.getClassSpaceName().equals(activeClassSpaceName.get())) {
-            activeClassSpaceName.set(editedGroup.getClassSpaceName());
+        addressBook.setGroup(target, editedGroup);
+        if (target.getGroupName().equals(activeGroupName.get())) {
+            activeGroupName.set(editedGroup.getGroupName());
             updateCurrentViewLabel();
         }
         refreshFilteredPersonList();
     }
 
     @Override
-    public ObservableList<Group> getClassSpaceList() {
-        return addressBook.getClassSpaceList();
+    public ObservableList<Group> getGroupList() {
+        return addressBook.getGroupList();
     }
 
     //=========== Filtered Person List Accessors =============================================================
@@ -215,7 +215,7 @@ public class ModelManager implements Model {
 
     @Override
     public void switchToAllStudentsView() {
-        activeClassSpaceName.set(null);
+        activeGroupName.set(null);
         clearActiveSessionDate();
         clearVisibleSessionRange();
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
@@ -224,17 +224,17 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public void switchToClassSpaceView(ClassSpaceName classSpaceName) {
-        requireNonNull(classSpaceName);
-        activeClassSpaceName.set(classSpaceName);
+    public void switchToGroupView(GroupName groupName) {
+        requireNonNull(groupName);
+        activeGroupName.set(groupName);
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
         updateCurrentViewLabel();
         refreshFilteredPersonList();
     }
 
     @Override
-    public Optional<ClassSpaceName> getActiveClassSpaceName() {
-        return Optional.ofNullable(activeClassSpaceName.get());
+    public Optional<GroupName> getActiveGroupName() {
+        return Optional.ofNullable(activeGroupName.get());
     }
 
     @Override
@@ -259,8 +259,8 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
-        return activeClassSpaceName;
+    public ReadOnlyObjectProperty<GroupName> activeGroupNameProperty() {
+        return activeGroupName;
     }
 
     @Override
@@ -316,15 +316,15 @@ public class ModelManager implements Model {
     }
 
     private void updateCurrentViewLabel() {
-        currentView.set(activeClassSpaceName.get() == null
+        currentView.set(activeGroupName.get() == null
                 ? ALL_STUDENTS_VIEW_NAME
-                : activeClassSpaceName.get().value);
+                : activeGroupName.get().value);
     }
 
     private void refreshFilteredPersonList() {
-        Predicate<Person> basePredicate = activeClassSpaceName.get() == null
+        Predicate<Person> basePredicate = activeGroupName.get() == null
                 ? PREDICATE_SHOW_ALL_PERSONS
-                : person -> person.hasClassSpace(activeClassSpaceName.get());
+                : person -> person.hasGroup(activeGroupName.get());
         filteredPersons.setPredicate(basePredicate.and(currentAdditionalPredicate));
     }
 
@@ -344,8 +344,8 @@ public class ModelManager implements Model {
                 && filteredPersons.equals(otherModelManager.filteredPersons)
                 && currentView.get().equals(otherModelManager.currentView.get())
                 && attendanceViewActive.get() == otherModelManager.attendanceViewActive.get()
-                && Optional.ofNullable(activeClassSpaceName.get()).equals(
-                        Optional.ofNullable(otherModelManager.activeClassSpaceName.get()))
+                && Optional.ofNullable(activeGroupName.get()).equals(
+                        Optional.ofNullable(otherModelManager.activeGroupName.get()))
                 && Optional.ofNullable(activeSessionDate.get()).equals(
                         Optional.ofNullable(otherModelManager.activeSessionDate.get()));
     }

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.EditSessionCommand;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 public class EditSessionCommandParserTest {
 
@@ -20,7 +20,7 @@ public class EditSessionCommandParserTest {
                 new EditSessionCommand(LocalDate.of(2026, 3, 16), LocalDate.of(2026, 3, 23)));
         assertParseSuccess(parser, " d/2026-03-16 nd/2026-03-23 g/T01",
                 new EditSessionCommand(LocalDate.of(2026, 3, 16), LocalDate.of(2026, 3, 23),
-                        new ClassSpaceName("T01")));
+                        new GroupName("T01")));
     }
 
     @Test

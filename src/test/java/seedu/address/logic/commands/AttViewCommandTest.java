@@ -15,8 +15,8 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.testutil.PersonBuilder;
@@ -25,8 +25,8 @@ import seedu.address.testutil.PersonBuilder;
  * Contains integration tests (interaction with the Model) for {@code ViewCommand}.
  */
 public class AttViewCommandTest {
-    private static final ClassSpaceName T01 = new ClassSpaceName("T01");
-    private static final ClassSpaceName T02 = new ClassSpaceName("T02");
+    private static final GroupName T01 = new GroupName("T01");
+    private static final GroupName T02 = new GroupName("T02");
     private static final LocalDate SESSION_DATE = LocalDate.of(2026, 3, 16);
 
     @Test
@@ -46,8 +46,8 @@ public class AttViewCommandTest {
     @Test
     public void execute_presentFilter_showsMatchingPersons() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.addPerson(new PersonBuilder().withName("Alice Present").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1).build());
@@ -59,7 +59,7 @@ public class AttViewCommandTest {
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 2).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setActiveSessionDate(SESSION_DATE);
         Attendance attendance = new Attendance(Attendance.Status.PRESENT);
         expectedModel.setAttendanceViewActive(true);
@@ -82,8 +82,8 @@ public class AttViewCommandTest {
     @Test
     public void execute_noFilter_showsCurrentView() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.setActiveSessionDate(SESSION_DATE);
         model.addPerson(new PersonBuilder().withName("Alice Present").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
@@ -93,7 +93,7 @@ public class AttViewCommandTest {
                 .withSession("T01", SESSION_DATE.toString(), "ABSENT", 0).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setActiveSessionDate(SESSION_DATE);
         expectedModel.setAttendanceViewActive(true);
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
@@ -108,8 +108,8 @@ public class AttViewCommandTest {
     @Test
     public void execute_groupView_showsWholeGroup() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.addClassSpace(new Group(T02));
+        model.addGroup(new Group(T01));
+        model.addGroup(new Group(T02));
         model.addPerson(new PersonBuilder().withName("Alice Present").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1).build());
@@ -121,7 +121,7 @@ public class AttViewCommandTest {
                 .withSession("T02", SESSION_DATE.toString(), "PRESENT", 4).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setActiveSessionDate(SESSION_DATE);
         expectedModel.setAttendanceViewActive(true);
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
@@ -136,21 +136,21 @@ public class AttViewCommandTest {
     @Test
     public void execute_missingGroup_throwsCommandException() {
         Model model = new ModelManager();
-        ViewCommand command = new ViewCommand(new ClassSpaceName("Missing"), SESSION_DATE);
+        ViewCommand command = new ViewCommand(new GroupName("Missing"), SESSION_DATE);
         assertThrows(CommandException.class, ViewCommand.MESSAGE_GROUP_NOT_FOUND, () -> command.execute(model));
     }
 
     @Test
     public void execute_noMatches_returnsNoMatchesMessage() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.addPerson(new PersonBuilder().withName("Only Present").withMatricNumber("A1234567X")
                 .withEmail("present@example.com").withPhone("94567890")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 0).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setActiveSessionDate(SESSION_DATE);
         Attendance attendance = new Attendance(Attendance.Status.ABSENT);
         expectedModel.setAttendanceViewActive(true);
@@ -166,8 +166,8 @@ public class AttViewCommandTest {
     @Test
     public void execute_withoutSessionContext_throwsCommandException() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
 
         ViewCommand command = new ViewCommand(new Attendance("PRESENT"));
         assertThrows(CommandException.class, ViewCommand.MESSAGE_NO_ACTIVE_SESSION, () -> command.execute(model));
@@ -176,13 +176,13 @@ public class AttViewCommandTest {
     @Test
     public void execute_noFilterWithoutSessionContext_showsOverview() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
-                .withEmail("alice@example.com").withPhone("91234567").withClassSpaces("T01").build());
+                .withEmail("alice@example.com").withPhone("91234567").withGroups("T01").build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setAttendanceViewActive(true);
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
 
@@ -194,14 +194,14 @@ public class AttViewCommandTest {
     @Test
     public void executeNoFilter_missingSession_persistsDefaultSession() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
         String matricNumber = "A1234567X";
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber(matricNumber)
-                .withEmail("alice@example.com").withPhone("91234567").withClassSpaces("T01").build());
+                .withEmail("alice@example.com").withPhone("91234567").withGroups("T01").build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
+        expectedModel.switchToGroupView(T01);
         expectedModel.setActiveSessionDate(SESSION_DATE);
         expectedModel.setAttendanceViewActive(true);
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
@@ -223,7 +223,7 @@ public class AttViewCommandTest {
 
         assertTrue(model.findPersonByMatricNumber(new MatricNumber(matricNumber))
                 .orElseThrow()
-                .getClassSpaceSessions()
+                .getGroupSessions()
                 .get(T01)
                 .getSession(SESSION_DATE)
                 .isPresent());

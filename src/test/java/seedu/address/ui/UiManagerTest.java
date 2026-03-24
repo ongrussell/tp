@@ -20,7 +20,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.logic.Logic;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -75,22 +75,22 @@ public class UiManagerTest {
     }
 
     @Test
-    public void buildStartUpMessage_contactAndClassSpaceWarnings_formatsSeparateSections() {
+    public void buildStartUpMessage_contactAndGroupWarnings_formatsSeparateSections() {
         Logic logicStub = new LogicStub(10);
         UiManager uiManager = new UiManager(logicStub, List.of());
 
         List<String> warnings = List.of(
                 "Skipped invalid contact 'Bob':\n- invalid email",
-                "Skipped invalid class space 'T#1':\n- invalid class space name"
+                "Skipped invalid group 'T#1':\n- invalid group name"
         );
 
         String result = uiManager.buildStartUpMessage(warnings);
 
         assertTrue(result.contains("10 contacts loaded successfully."));
         assertTrue(result.contains("1 contact could not be loaded and was skipped:"));
-        assertTrue(result.contains("1 class space could not be loaded and was skipped:"));
+        assertTrue(result.contains("1 group could not be loaded and was skipped:"));
         assertTrue(result.contains("1. Skipped invalid contact 'Bob':\n- invalid email"));
-        assertTrue(result.contains("1. Skipped invalid class space 'T#1':\n- invalid class space name"));
+        assertTrue(result.contains("1. Skipped invalid group 'T#1':\n- invalid group name"));
     }
 
     @Test
@@ -144,14 +144,14 @@ public class UiManagerTest {
     }
 
     @Test
-    public void buildStartUpMessage_duplicateClassSpaceWarning_classifiedAsClassSpaceWarning() {
+    public void buildStartUpMessage_duplicateGroupWarning_classifiedAsGroupWarning() {
         Logic logicStub = new LogicStub(1);
         UiManager uiManager = new UiManager(logicStub, List.of());
 
-        List<String> warnings = List.of("Skipped duplicate class space 'T01'");
+        List<String> warnings = List.of("Skipped duplicate group 'T01'");
         String result = uiManager.buildStartUpMessage(warnings);
 
-        assertTrue(result.contains("1 class space could not be loaded and was skipped:"));
+        assertTrue(result.contains("1 group could not be loaded and was skipped:"));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class UiManagerTest {
         }
 
         @Override
-        public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
+        public ReadOnlyObjectProperty<GroupName> activeGroupNameProperty() {
             throw new UnsupportedOperationException();
         }
 

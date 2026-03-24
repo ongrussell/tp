@@ -12,14 +12,14 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
 
 /**
  * Assigns a participation value to a person identified using the displayed index
- * for a specified session date in the current or specified class space.
+ * for a specified session date in the current or specified group.
  */
 public class PartCommand extends Command {
 
@@ -27,7 +27,7 @@ public class PartCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
-            + "Parameters: i/INDEX [d/YYYY-MM-DD] [g/CLASSSPACE] pv/PARTICIPATION_VALUE\n"
+            + "Parameters: i/INDEX [d/YYYY-MM-DD] [g/GROUP] pv/PARTICIPATION_VALUE\n"
             + "Participation must be an integer from 0 to 5.\n"
             + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02 pv/4\n"
             + "         " + COMMAND_WORD + " i/1 pv/4";
@@ -35,38 +35,38 @@ public class PartCommand extends Command {
     public static final String MESSAGE_PARTICIPATION_SUCCESS =
             "Updated participation for Person: %1$s";
 
-    public static final String MESSAGE_CLASS_SPACE_NOT_FOUND =
-            "This class space does not exist.";
+    public static final String MESSAGE_GROUP_NOT_FOUND =
+            "This group does not exist.";
 
-    public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
-            "No class space selected. Enter a class space first or provide g/CLASS_SPACE.";
+    public static final String MESSAGE_NO_ACTIVE_GROUP =
+            "No group selected. Enter a group first or provide g/GROUP.";
     public static final String MESSAGE_REQUIRES_GROUP_VIEW =
-            "Update participation from a class space view only. Use switchgroup g/GROUP_NAME first.";
+            "Update participation from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or run view with d/YYYY-MM-DD first.";
 
     private final Index targetIndex;
     private final Optional<LocalDate> date;
-    private final Optional<ClassSpaceName> classSpaceName;
+    private final Optional<GroupName> groupName;
     private final Participation participation;
 
     /**
      * Creates a PartCommand to assign the specified {@code Participation}
      * value to the person identified by the given {@code Index}, for the
-     * specified session date and current or specified class space.
+     * specified session date and current or specified group.
      *
      * @param targetIndex Index of the person in the filtered person list whose participation
      *                    level is to be updated.
      * @param date Date of the session to update participation for.
-     * @param classSpaceName Class space containing this session, if explicitly provided.
+     * @param groupName Group containing this session, if explicitly provided.
      * @param participation Participation value to assign to the specified person.
      */
-    public PartCommand(Index targetIndex, Optional<LocalDate> date, Optional<ClassSpaceName> classSpaceName,
+    public PartCommand(Index targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName,
                        Participation participation) {
-        requireAllNonNull(targetIndex, date, classSpaceName, participation);
+        requireAllNonNull(targetIndex, date, groupName, participation);
         this.targetIndex = targetIndex;
         this.date = date;
-        this.classSpaceName = classSpaceName;
+        this.groupName = groupName;
         this.participation = participation;
     }
 
@@ -74,29 +74,29 @@ public class PartCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        if (model.getActiveClassSpaceName().isEmpty()) {
+        if (model.getActiveGroupName().isEmpty()) {
             throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
         }
 
-        // Step 1: switch class space if g/ provided
-        if (classSpaceName.isPresent()) {
-            ClassSpaceName targetName = classSpaceName.get();
+        // Step 1: switch group if g/ provided
+        if (groupName.isPresent()) {
+            GroupName targetName = groupName.get();
 
-            if (model.findClassSpaceByName(targetName).isEmpty()) {
-                throw new CommandException(MESSAGE_CLASS_SPACE_NOT_FOUND);
+            if (model.findGroupByName(targetName).isEmpty()) {
+                throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
             }
 
-            model.switchToClassSpaceView(targetName);
+            model.switchToGroupView(targetName);
         }
 
-        // Step 2: resolve active class space
-        Optional<ClassSpaceName> activeClassSpace = model.getActiveClassSpaceName();
+        // Step 2: resolve active group
+        Optional<GroupName> activeGroup = model.getActiveGroupName();
 
-        if (activeClassSpace.isEmpty()) {
-            throw new CommandException(MESSAGE_NO_ACTIVE_CLASS_SPACE);
+        if (activeGroup.isEmpty()) {
+            throw new CommandException(MESSAGE_NO_ACTIVE_GROUP);
         }
 
-        ClassSpaceName classSpace = activeClassSpace.get();
+        GroupName group = activeGroup.get();
         Optional<LocalDate> resolvedDate = date.isPresent() ? date : model.getActiveSessionDate();
         if (resolvedDate.isEmpty()) {
             throw new CommandException(MESSAGE_NO_ACTIVE_SESSION);
@@ -115,7 +115,7 @@ public class PartCommand extends Command {
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
 
         // Step 4: get session
-        Session currentSession = personToUpdate.getOrCreateSession(classSpace, targetDate);
+        Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
 
         // Step 5: update participation
         Session updatedSession = new Session(
@@ -126,7 +126,7 @@ public class PartCommand extends Command {
         );
 
         // Step 6: update person
-        Person updatedPerson = personToUpdate.withUpdatedSession(classSpace, updatedSession);
+        Person updatedPerson = personToUpdate.withUpdatedSession(group, updatedSession);
 
         // Step 7: update model
         model.setPerson(personToUpdate, updatedPerson);
@@ -134,7 +134,7 @@ public class PartCommand extends Command {
 
         return new CommandResult(String.format(
                 MESSAGE_PARTICIPATION_SUCCESS,
-                Messages.format(updatedPerson, classSpace, targetDate))
+                Messages.format(updatedPerson, group, targetDate))
         );
     }
 
@@ -150,7 +150,7 @@ public class PartCommand extends Command {
 
         return targetIndex.equals(otherPartCommand.targetIndex)
                 && date.equals(otherPartCommand.date)
-                && classSpaceName.equals(otherPartCommand.classSpaceName)
+                && groupName.equals(otherPartCommand.groupName)
                 && participation.equals(otherPartCommand.participation);
     }
 
@@ -159,7 +159,7 @@ public class PartCommand extends Command {
         return new ToStringBuilder(this)
                 .add("targetIndex", targetIndex)
                 .add("date", date)
-                .add("classSpaceName", classSpaceName)
+                .add("groupName", groupName)
                 .add("participation", participation)
                 .toString();
     }

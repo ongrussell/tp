@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.EditSessionCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new EditSessionCommand object.
@@ -37,8 +37,8 @@ public class EditSessionCommandParser implements Parser<EditSessionCommand> {
         }
         Optional<String> newNote = argMultimap.getValue(PREFIX_NEW_NOTE).map(String::trim);
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-            ClassSpaceName classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
-            return new EditSessionCommand(originalDate, newDate, newNote, Optional.of(classSpaceName));
+            GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+            return new EditSessionCommand(originalDate, newDate, newNote, Optional.of(groupName));
         }
         return new EditSessionCommand(originalDate, newDate, newNote, Optional.empty());
     }

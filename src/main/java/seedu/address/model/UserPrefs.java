@@ -16,7 +16,7 @@ public class UserPrefs implements ReadOnlyUserPrefs {
 
     private GuiSettings guiSettings = new GuiSettings();
     private Path addressBookFilePath = Paths.get("data" , "addressbook.json");
-    private String lastActiveClassSpaceName;
+    private String lastActiveGroupName;
     private String lastActiveSessionDate;
     private boolean attendanceViewActive;
 
@@ -40,7 +40,7 @@ public class UserPrefs implements ReadOnlyUserPrefs {
         requireNonNull(newUserPrefs);
         setGuiSettings(newUserPrefs.getGuiSettings());
         setAddressBookFilePath(newUserPrefs.getAddressBookFilePath());
-        setLastActiveClassSpaceName(newUserPrefs.getLastActiveClassSpaceName().orElse(null));
+        setLastActiveGroupName(newUserPrefs.getLastActiveGroupName().orElse(null));
         setLastActiveSessionDate(newUserPrefs.getLastActiveSessionDate().orElse(null));
         setAttendanceViewActive(newUserPrefs.isAttendanceViewActive());
     }
@@ -63,12 +63,12 @@ public class UserPrefs implements ReadOnlyUserPrefs {
         this.addressBookFilePath = addressBookFilePath;
     }
 
-    public Optional<String> getLastActiveClassSpaceName() {
-        return Optional.ofNullable(lastActiveClassSpaceName);
+    public Optional<String> getLastActiveGroupName() {
+        return Optional.ofNullable(lastActiveGroupName);
     }
 
-    public void setLastActiveClassSpaceName(String lastActiveClassSpaceName) {
-        this.lastActiveClassSpaceName = lastActiveClassSpaceName;
+    public void setLastActiveGroupName(String lastActiveGroupName) {
+        this.lastActiveGroupName = lastActiveGroupName;
     }
 
     public Optional<String> getLastActiveSessionDate() {
@@ -101,7 +101,7 @@ public class UserPrefs implements ReadOnlyUserPrefs {
         UserPrefs otherUserPrefs = (UserPrefs) other;
         return guiSettings.equals(otherUserPrefs.guiSettings)
                 && addressBookFilePath.equals(otherUserPrefs.addressBookFilePath)
-                && Objects.equals(lastActiveClassSpaceName, otherUserPrefs.lastActiveClassSpaceName)
+                && Objects.equals(lastActiveGroupName, otherUserPrefs.lastActiveGroupName)
                 && Objects.equals(lastActiveSessionDate, otherUserPrefs.lastActiveSessionDate)
                 && attendanceViewActive == otherUserPrefs.attendanceViewActive;
     }
@@ -109,7 +109,7 @@ public class UserPrefs implements ReadOnlyUserPrefs {
     @Override
     public int hashCode() {
         return Objects.hash(guiSettings, addressBookFilePath,
-                lastActiveClassSpaceName, lastActiveSessionDate, attendanceViewActive);
+                lastActiveGroupName, lastActiveSessionDate, attendanceViewActive);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class UserPrefs implements ReadOnlyUserPrefs {
         StringBuilder sb = new StringBuilder();
         sb.append("Gui Settings : " + guiSettings);
         sb.append("\nLocal data file location : " + addressBookFilePath);
-        sb.append("\nLast active class space : " + lastActiveClassSpaceName);
+        sb.append("\nLast active group : " + lastActiveGroupName);
         sb.append("\nLast active session date : " + lastActiveSessionDate);
         sb.append("\nAttendance view active : " + attendanceViewActive);
         return sb.toString();

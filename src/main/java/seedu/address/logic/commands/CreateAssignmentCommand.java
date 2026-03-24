@@ -10,10 +10,10 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
 
 /**
- * Creates an assignment in the current class space.
+ * Creates an assignment in the current group.
  */
 public class CreateAssignmentCommand extends ClassScopedAssignmentCommand {
 
@@ -21,7 +21,7 @@ public class CreateAssignmentCommand extends ClassScopedAssignmentCommand {
     public static final String SHORT_COMMAND_WORD = "createa";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + " (alias: " + SHORT_COMMAND_WORD + ")"
-            + ": Creates an assignment in the current class space.\n"
+            + ": Creates an assignment in the current group.\n"
             + "Parameters: a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS\n"
             + "Example: " + SHORT_COMMAND_WORD + " a/Quiz 1 d/2026-04-05 mm/20";
 
@@ -45,17 +45,17 @@ public class CreateAssignmentCommand extends ClassScopedAssignmentCommand {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Group activeGroup = getActiveClassSpace(model);
+        Group activeGroup = getActiveGroup(model);
         if (activeGroup.hasAssignment(assignmentName)) {
             throw new CommandException(MESSAGE_DUPLICATE_ASSIGNMENT);
         }
 
         List<Assignment> updatedAssignments = new ArrayList<>(activeGroup.getAssignments());
         updatedAssignments.add(new Assignment(assignmentName, dueDate, maxMarks));
-        Group updatedGroup = new Group(activeGroup.getClassSpaceName(), updatedAssignments);
-        model.setClassSpace(activeGroup, updatedGroup);
+        Group updatedGroup = new Group(activeGroup.getGroupName(), updatedAssignments);
+        model.setGroup(activeGroup, updatedGroup);
         return new CommandResult(String.format(MESSAGE_SUCCESS, assignmentName.value,
-                activeGroup.getClassSpaceName().value));
+                activeGroup.getGroupName().value));
     }
 
     @Override

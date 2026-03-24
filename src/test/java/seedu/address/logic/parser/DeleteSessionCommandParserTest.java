@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.DeleteSessionCommand;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 public class DeleteSessionCommandParserTest {
 
@@ -18,7 +18,7 @@ public class DeleteSessionCommandParserTest {
     public void parse_validArgs_returnsDeleteSessionCommand() {
         assertParseSuccess(parser, " d/2026-03-16", new DeleteSessionCommand(LocalDate.of(2026, 3, 16)));
         assertParseSuccess(parser, " d/2026-03-16 g/T01",
-                new DeleteSessionCommand(LocalDate.of(2026, 3, 16), new ClassSpaceName("T01")));
+                new DeleteSessionCommand(LocalDate.of(2026, 3, 16), new GroupName("T01")));
     }
 
     @Test

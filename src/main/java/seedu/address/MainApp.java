@@ -200,8 +200,8 @@ public class MainApp extends Application {
         }
         try {
             UserPrefs prefsToSave = new UserPrefs(model.getUserPrefs());
-            prefsToSave.setLastActiveClassSpaceName(
-                    model.getActiveClassSpaceName().map(classSpaceName -> classSpaceName.value).orElse(null));
+            prefsToSave.setLastActiveGroupName(
+                    model.getActiveGroupName().map(groupName -> groupName.value).orElse(null));
             prefsToSave.setLastActiveSessionDate(
                     model.getActiveSessionDate().map(Object::toString).orElse(null));
             prefsToSave.setAttendanceViewActive(model.isAttendanceViewActive());

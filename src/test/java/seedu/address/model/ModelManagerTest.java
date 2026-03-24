@@ -16,8 +16,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.testutil.AddressBookBuilder;
 
@@ -35,14 +35,14 @@ public class ModelManagerTest {
     @Test
     public void constructor_withSavedViewContext_startsAtHomeView() {
         AddressBook addressBook = new AddressBookBuilder().build();
-        addressBook.addClassSpace(new Group(new ClassSpaceName("T01")));
+        addressBook.addGroup(new Group(new GroupName("T01")));
         UserPrefs userPrefs = new UserPrefs();
-        userPrefs.setLastActiveClassSpaceName("T01");
+        userPrefs.setLastActiveGroupName("T01");
         userPrefs.setLastActiveSessionDate("2026-03-16");
         userPrefs.setAttendanceViewActive(true);
 
         ModelManager modelManager = new ModelManager(addressBook, userPrefs);
-        assertTrue(modelManager.getActiveClassSpaceName().isEmpty());
+        assertTrue(modelManager.getActiveGroupName().isEmpty());
         assertTrue(modelManager.getActiveSessionDate().isEmpty());
         assertFalse(modelManager.isAttendanceViewActive());
         assertEquals(Model.ALL_STUDENTS_VIEW_NAME, modelManager.currentViewProperty().get());

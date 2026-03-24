@@ -13,25 +13,25 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 
 public class CreateAssignmentCommandTest {
 
-    private static final ClassSpaceName T01 = new ClassSpaceName("T01");
+    private static final GroupName T01 = new GroupName("T01");
 
     @Test
     public void execute_validClassContext_success() {
         Model model = new ModelManager();
-        model.addClassSpace(new Group(T01));
-        model.switchToClassSpaceView(T01);
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
 
         CreateAssignmentCommand command = new CreateAssignmentCommand(new AssignmentName("Quiz 1"),
                 LocalDate.of(2026, 4, 5), 20);
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.switchToClassSpaceView(T01);
-        expectedModel.setClassSpace(new Group(T01), new Group(T01,
+        expectedModel.switchToGroupView(T01);
+        expectedModel.setGroup(new Group(T01), new Group(T01,
                 List.of(new Assignment(new AssignmentName("Quiz 1"), LocalDate.of(2026, 4, 5), 20))));
 
         assertCommandSuccess(command, model, "Created assignment Quiz 1 in T01.", expectedModel);
@@ -42,6 +42,6 @@ public class CreateAssignmentCommandTest {
         Model model = new ModelManager();
         assertCommandFailure(new CreateAssignmentCommand(new AssignmentName("Quiz 1"),
                 LocalDate.of(2026, 4, 5), 20), model,
-                ClassScopedAssignmentCommand.MESSAGE_REQUIRE_ACTIVE_CLASS_SPACE);
+                ClassScopedAssignmentCommand.MESSAGE_REQUIRE_ACTIVE_GROUP);
     }
 }

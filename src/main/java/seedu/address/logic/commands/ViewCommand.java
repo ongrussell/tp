@@ -11,14 +11,14 @@ import java.util.Optional;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
 
 /**
- * Shows attendance and participation information for the current class space.
+ * Shows attendance and participation information for the current group.
  */
 public class ViewCommand extends Command {
 
@@ -35,22 +35,22 @@ public class ViewCommand extends Command {
             + "          " + COMMAND_WORD + " from/2026-03-01 to/2026-03-31";
 
     public static final String MESSAGE_SUCCESS =
-            "Listed %1$d students with attendance %2$s in class space %3$s for session %4$s";
+            "Listed %1$d students with attendance %2$s in group %3$s for session %4$s";
     public static final String MESSAGE_VIEW_SUCCESS =
-            "Showing attendance and participation for %1$d students in class space %2$s for session %3$s";
+            "Showing attendance and participation for %1$d students in group %2$s for session %3$s";
     public static final String MESSAGE_OVERVIEW_SUCCESS =
-            "Showing attendance and participation overview for %1$d students in class space %2$s";
+            "Showing attendance and participation overview for %1$d students in group %2$s";
     public static final String MESSAGE_NO_MATCHES =
-            "No students with attendance %1$s were found in class space %2$s for session %3$s";
+            "No students with attendance %1$s were found in group %2$s for session %3$s";
     public static final String MESSAGE_GROUP_NOT_FOUND =
-            "This class space does not exist.";
-    public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
-            "No class space selected. Enter a class space first or provide g/GROUP_NAME.";
+            "This group does not exist.";
+    public static final String MESSAGE_NO_ACTIVE_GROUP =
+            "No group selected. Enter a group first or provide g/GROUP_NAME.";
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or mark attendance/participation for a session first.";
 
     private final Optional<Attendance> attendance;
-    private final Optional<ClassSpaceName> classSpaceName;
+    private final Optional<GroupName> groupName;
     private final Optional<LocalDate> sessionDate;
     private final Optional<LocalDate> rangeStartDate;
     private final Optional<LocalDate> rangeEndDate;
@@ -72,33 +72,33 @@ public class ViewCommand extends Command {
     }
 
     /**
-     * Creates a view command filtered by attendance and class space.
+     * Creates a view command filtered by attendance and group.
      */
-    public ViewCommand(Attendance attendance, ClassSpaceName classSpaceName) {
-        this(Optional.of(attendance), Optional.of(classSpaceName), Optional.empty(),
+    public ViewCommand(Attendance attendance, GroupName groupName) {
+        this(Optional.of(attendance), Optional.of(groupName), Optional.empty(),
                 Optional.empty(), Optional.empty());
     }
 
     /**
-     * Creates a view command filtered by attendance, class space, and session date.
+     * Creates a view command filtered by attendance, group, and session date.
      */
-    public ViewCommand(Attendance attendance, ClassSpaceName classSpaceName, LocalDate sessionDate) {
-        this(Optional.of(attendance), Optional.of(classSpaceName), Optional.of(sessionDate),
+    public ViewCommand(Attendance attendance, GroupName groupName, LocalDate sessionDate) {
+        this(Optional.of(attendance), Optional.of(groupName), Optional.of(sessionDate),
                 Optional.empty(), Optional.empty());
     }
 
     /**
-     * Creates a view command scoped to a class space.
+     * Creates a view command scoped to a group.
      */
-    public ViewCommand(ClassSpaceName classSpaceName) {
-        this(Optional.empty(), Optional.of(classSpaceName), Optional.empty(), Optional.empty(), Optional.empty());
+    public ViewCommand(GroupName groupName) {
+        this(Optional.empty(), Optional.of(groupName), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     /**
-     * Creates a view command scoped to a class space and highlighted session date.
+     * Creates a view command scoped to a group and highlighted session date.
      */
-    public ViewCommand(ClassSpaceName classSpaceName, LocalDate sessionDate) {
-        this(Optional.empty(), Optional.of(classSpaceName), Optional.of(sessionDate),
+    public ViewCommand(GroupName groupName, LocalDate sessionDate) {
+        this(Optional.empty(), Optional.of(groupName), Optional.of(sessionDate),
                 Optional.empty(), Optional.empty());
     }
 
@@ -110,20 +110,20 @@ public class ViewCommand extends Command {
     }
 
     /**
-     * Creates a view command with optional attendance, class space, session date, and visible date range filters.
+     * Creates a view command with optional attendance, group, session date, and visible date range filters.
      */
     public ViewCommand(Optional<Attendance> attendance,
-                       Optional<ClassSpaceName> classSpaceName,
+                       Optional<GroupName> groupName,
                        Optional<LocalDate> sessionDate,
                        Optional<LocalDate> rangeStartDate,
                        Optional<LocalDate> rangeEndDate) {
         requireNonNull(attendance);
-        requireNonNull(classSpaceName);
+        requireNonNull(groupName);
         requireNonNull(sessionDate);
         requireNonNull(rangeStartDate);
         requireNonNull(rangeEndDate);
         this.attendance = attendance;
-        this.classSpaceName = classSpaceName;
+        this.groupName = groupName;
         this.sessionDate = sessionDate;
         this.rangeStartDate = rangeStartDate;
         this.rangeEndDate = rangeEndDate;
@@ -132,16 +132,16 @@ public class ViewCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        if (classSpaceName.isPresent()) {
-            ClassSpaceName targetName = classSpaceName.get();
-            if (model.findClassSpaceByName(targetName).isEmpty()) {
+        if (groupName.isPresent()) {
+            GroupName targetName = groupName.get();
+            if (model.findGroupByName(targetName).isEmpty()) {
                 throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
             }
-            model.switchToClassSpaceView(targetName);
+            model.switchToGroupView(targetName);
         }
 
-        ClassSpaceName targetClassSpace = model.getActiveClassSpaceName()
-                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_CLASS_SPACE));
+        GroupName targetGroup = model.getActiveGroupName()
+                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
         Optional<LocalDate> resolvedSessionDate = sessionDate.isPresent()
                 ? sessionDate
                 : model.getActiveSessionDate();
@@ -155,7 +155,7 @@ public class ViewCommand extends Command {
         if (resolvedSessionDate.isPresent()) {
             LocalDate targetSessionDate = resolvedSessionDate.get();
             model.setActiveSessionDate(targetSessionDate);
-            initializeMissingSessionsForCurrentView(model, targetClassSpace, targetSessionDate);
+            initializeMissingSessionsForCurrentView(model, targetGroup, targetSessionDate);
         }
 
         if (attendance.isEmpty()) {
@@ -163,10 +163,10 @@ public class ViewCommand extends Command {
             if (resolvedSessionDate.isPresent()) {
                 return new CommandResult(String.format(
                         MESSAGE_VIEW_SUCCESS, model.getFilteredPersonList().size(),
-                        targetClassSpace, resolvedSessionDate.get()));
+                        targetGroup, resolvedSessionDate.get()));
             }
             return new CommandResult(String.format(
-                    MESSAGE_OVERVIEW_SUCCESS, model.getFilteredPersonList().size(), targetClassSpace));
+                    MESSAGE_OVERVIEW_SUCCESS, model.getFilteredPersonList().size(), targetGroup));
         }
 
         if (resolvedSessionDate.isEmpty()) {
@@ -175,28 +175,28 @@ public class ViewCommand extends Command {
 
         LocalDate targetSessionDate = resolvedSessionDate.get();
         Attendance targetAttendance = attendance.get();
-        model.updateFilteredPersonList(person -> person.getAttendance(targetClassSpace, targetSessionDate)
+        model.updateFilteredPersonList(person -> person.getAttendance(targetGroup, targetSessionDate)
                 .equals(targetAttendance));
         int matchCount = model.getFilteredPersonList().size();
         if (matchCount == 0) {
             return new CommandResult(String.format(
-                    MESSAGE_NO_MATCHES, targetAttendance, targetClassSpace, targetSessionDate));
+                    MESSAGE_NO_MATCHES, targetAttendance, targetGroup, targetSessionDate));
         }
 
         return new CommandResult(String.format(
-                MESSAGE_SUCCESS, matchCount, targetAttendance, targetClassSpace, targetSessionDate));
+                MESSAGE_SUCCESS, matchCount, targetAttendance, targetGroup, targetSessionDate));
     }
 
-    private void initializeMissingSessionsForCurrentView(Model model, ClassSpaceName classSpaceName, LocalDate date) {
+    private void initializeMissingSessionsForCurrentView(Model model, GroupName groupName, LocalDate date) {
         List<Person> personsInCurrentView = new ArrayList<>(model.getFilteredPersonList());
         for (Person person : personsInCurrentView) {
-            boolean sessionExists = Optional.ofNullable(person.getClassSpaceSessions().get(classSpaceName))
+            boolean sessionExists = Optional.ofNullable(person.getGroupSessions().get(groupName))
                     .flatMap(sessionList -> sessionList.getSession(date))
                     .isPresent();
             if (!sessionExists) {
                 Session defaultSession = new Session(date, new Attendance(Attendance.Status.UNINITIALISED),
                         new Participation(0), "");
-                Person updatedPerson = person.withUpdatedSession(classSpaceName, defaultSession);
+                Person updatedPerson = person.withUpdatedSession(groupName, defaultSession);
                 model.setPerson(person, updatedPerson);
             }
         }
@@ -213,7 +213,7 @@ public class ViewCommand extends Command {
         }
 
         return attendance.equals(otherViewCommand.attendance)
-                && classSpaceName.equals(otherViewCommand.classSpaceName)
+                && groupName.equals(otherViewCommand.groupName)
                 && sessionDate.equals(otherViewCommand.sessionDate)
                 && rangeStartDate.equals(otherViewCommand.rangeStartDate)
                 && rangeEndDate.equals(otherViewCommand.rangeEndDate);
@@ -223,7 +223,7 @@ public class ViewCommand extends Command {
     public String toString() {
         return new ToStringBuilder(this)
                 .add("attendance", attendance)
-                .add("groupName", classSpaceName)
+                .add("groupName", groupName)
                 .add("sessionDate", sessionDate)
                 .add("rangeStartDate", rangeStartDate)
                 .add("rangeEndDate", rangeEndDate)

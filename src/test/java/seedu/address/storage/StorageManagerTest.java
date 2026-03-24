@@ -101,7 +101,7 @@ public class StorageManagerTest {
 
     @Test
     public void getLastLoadWarnings_afterReadingInvalidData_returnsWarnings() throws Exception {
-        Path filePath = testFolder.resolve("invalidClassSpaceAddressBook.json");
+        Path filePath = testFolder.resolve("invalidGroupAddressBook.json");
         String json = """
             {
               "persons": [],
@@ -126,7 +126,7 @@ public class StorageManagerTest {
         manager.readAddressBook();
 
         assertEquals(1, manager.getLastLoadWarnings().size());
-        assertTrue(manager.getLastLoadWarnings().get(0).contains("Skipped invalid class space"));
+        assertTrue(manager.getLastLoadWarnings().get(0).contains("Skipped invalid group"));
     }
 
 }

@@ -14,8 +14,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import seedu.address.model.assignment.Assignment;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
 
@@ -55,7 +55,7 @@ public class PersonCard extends UiPart<Region> {
      * Creates a {@code PersonCard} with the given {@code Person} and index to display.
      */
     public PersonCard(Person person, int displayedIndex, boolean showSessionDetails,
-                      ClassSpaceName activeClassSpaceName, LocalDate activeSessionDate,
+                      GroupName activeGroupName, LocalDate activeSessionDate,
                       ObservableList<Group> groups) {
         super(FXML);
         this.person = person;
@@ -64,10 +64,10 @@ public class PersonCard extends UiPart<Region> {
         phone.setText(person.getPhone().value);
         matricNumber.setText(person.getMatricNumber().value);
         email.setText(person.getEmail().value);
-        boolean canShowSessionDetails = showSessionDetails && activeClassSpaceName != null && activeSessionDate != null;
+        boolean canShowSessionDetails = showSessionDetails && activeGroupName != null && activeSessionDate != null;
         if (canShowSessionDetails) {
-            attendance.setText(formatAttendance(person, activeClassSpaceName, activeSessionDate));
-            participation.setText("Participation: " + person.getParticipation(activeClassSpaceName, activeSessionDate));
+            attendance.setText(formatAttendance(person, activeGroupName, activeSessionDate));
+            participation.setText("Participation: " + person.getParticipation(activeGroupName, activeSessionDate));
         }
         attendance.setManaged(canShowSessionDetails);
         attendance.setVisible(canShowSessionDetails);
@@ -76,38 +76,38 @@ public class PersonCard extends UiPart<Region> {
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
-        person.getClassSpaces().stream()
-                .sorted(Comparator.comparing(classSpaceName -> classSpaceName.value,
+        person.getGroups().stream()
+                .sorted(Comparator.comparing(groupName -> groupName.value,
                         String.CASE_INSENSITIVE_ORDER))
-                .forEach(classSpaceName -> this.groups.getChildren().add(new Label(classSpaceName.value)));
+                .forEach(groupName -> this.groups.getChildren().add(new Label(groupName.value)));
 
-        populateAssignments(activeClassSpaceName, groups);
+        populateAssignments(activeGroupName, groups);
     }
 
-    private void populateAssignments(ClassSpaceName activeClassSpaceName, ObservableList<Group> groups) {
-        boolean shouldShowAssignments = activeClassSpaceName != null;
+    private void populateAssignments(GroupName activeGroupName, ObservableList<Group> groups) {
+        boolean shouldShowAssignments = activeGroupName != null;
         assignments.setManaged(shouldShowAssignments);
         assignments.setVisible(shouldShowAssignments);
         if (!shouldShowAssignments) {
             return;
         }
 
-        Optional<Group> activeClassSpace = groups.stream()
-                .filter(classSpace -> classSpace.getClassSpaceName().equals(activeClassSpaceName))
+        Optional<Group> activeGroup = groups.stream()
+                .filter(group -> group.getGroupName().equals(activeGroupName))
                 .findFirst();
-        if (activeClassSpace.isEmpty()) {
+        if (activeGroup.isEmpty()) {
             return;
         }
 
-        List<Assignment> assignmentList = new ArrayList<>(activeClassSpace.get().getAssignments().stream().toList());
+        List<Assignment> assignmentList = new ArrayList<>(activeGroup.get().getAssignments().stream().toList());
         Collections.reverse(assignmentList);
 
         assignmentList.forEach(assignment -> assignments.getChildren().add(
-                createAssignmentLabel(assignment, activeClassSpaceName)));
+                createAssignmentLabel(assignment, activeGroupName)));
     }
 
-    private Label createAssignmentLabel(Assignment assignment, ClassSpaceName activeClassSpaceName) {
-        Optional<Integer> grade = person.getAssignmentGrade(activeClassSpaceName, assignment.getAssignmentName());
+    private Label createAssignmentLabel(Assignment assignment, GroupName activeGroupName) {
+        Optional<Integer> grade = person.getAssignmentGrade(activeGroupName, assignment.getAssignmentName());
         String gradeText = grade.map(value -> value + "/" + assignment.getMaxMarks())
                 .orElse("-");
 
@@ -123,8 +123,8 @@ public class PersonCard extends UiPart<Region> {
         return assignmentLabel;
     }
 
-    private String formatAttendance(Person person, ClassSpaceName classSpaceName, LocalDate sessionDate) {
-        Attendance sessionAttendance = person.getAttendance(classSpaceName, sessionDate);
+    private String formatAttendance(Person person, GroupName groupName, LocalDate sessionDate) {
+        Attendance sessionAttendance = person.getAttendance(groupName, sessionDate);
         return switch (sessionAttendance.value) {
         case PRESENT -> "Attendance: [X] Present";
         case ABSENT -> "Attendance: [ ] Absent";

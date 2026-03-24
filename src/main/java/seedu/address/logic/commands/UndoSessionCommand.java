@@ -21,8 +21,8 @@ public class UndoSessionCommand extends Command {
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_HISTORY));
 
         model.setAddressBook(snapshot.addressBook());
-        if (snapshot.activeClassSpaceName().isPresent()) {
-            model.switchToClassSpaceView(snapshot.activeClassSpaceName().get());
+        if (snapshot.activeGroupName().isPresent()) {
+            model.switchToGroupView(snapshot.activeGroupName().get());
         } else {
             model.switchToAllStudentsView();
         }

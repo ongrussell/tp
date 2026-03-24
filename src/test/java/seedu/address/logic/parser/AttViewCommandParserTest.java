@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.ViewCommand;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 
 public class AttViewCommandParserTest {
@@ -38,13 +38,13 @@ public class AttViewCommandParserTest {
         assertParseSuccess(parser, "present", new ViewCommand(new Attendance("PRESENT")));
         assertParseSuccess(parser, "  ABSENT  ", new ViewCommand(new Attendance("ABSENT")));
         assertParseSuccess(parser, "d/2026-03-16", new ViewCommand(LocalDate.of(2026, 3, 16)));
-        assertParseSuccess(parser, "g/T01", new ViewCommand(new ClassSpaceName("T01")));
+        assertParseSuccess(parser, "g/T01", new ViewCommand(new GroupName("T01")));
         assertParseSuccess(parser, "d/2026-03-16 g/T01",
-                new ViewCommand(new ClassSpaceName("T01"), LocalDate.of(2026, 3, 16)));
+                new ViewCommand(new GroupName("T01"), LocalDate.of(2026, 3, 16)));
         assertParseSuccess(parser, "present d/2026-03-16",
                 new ViewCommand(new Attendance("PRESENT"), LocalDate.of(2026, 3, 16)));
         assertParseSuccess(parser, "present d/2026-03-16 g/T01",
                 new ViewCommand(new Attendance("PRESENT"),
-                        new ClassSpaceName("T01"), LocalDate.of(2026, 3, 16)));
+                        new GroupName("T01"), LocalDate.of(2026, 3, 16)));
     }
 }

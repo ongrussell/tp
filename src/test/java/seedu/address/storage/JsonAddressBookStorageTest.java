@@ -21,8 +21,8 @@ import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.commons.util.FileUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.testutil.PersonBuilder;
 
@@ -101,13 +101,13 @@ public class JsonAddressBookStorageTest {
     public void readAndSaveAddressBook_personSessionFieldsPreserved_success() throws Exception {
         Path filePath = testFolder.resolve("TempAddressBookWithSessionFields.json");
         AddressBook original = new AddressBook();
-        original.addClassSpace(new Group(new ClassSpaceName("CS2103T-T01")));
+        original.addGroup(new Group(new GroupName("CS2103T-T01")));
         original.addPerson(new PersonBuilder()
                 .withName("Session Student")
                 .withMatricNumber("A1234567X")
                 .withPhone("91234567")
                 .withEmail("session@example.com")
-                .withClassSpaces("CS2103T-T01")
+                .withGroups("CS2103T-T01")
                 .withSession("CS2103T-T01", "2026-03-16", "PRESENT", 5)
                 .build());
 
@@ -120,7 +120,7 @@ public class JsonAddressBookStorageTest {
                 .filter(person -> person.getMatricNumber().equals(new MatricNumber("A1234567X")))
                 .findFirst()
                 .orElseThrow()
-                .getAttendance(new ClassSpaceName("CS2103T-T01"), java.time.LocalDate.of(2026, 3, 16))
+                .getAttendance(new GroupName("CS2103T-T01"), java.time.LocalDate.of(2026, 3, 16))
                 .toString());
     }
 
@@ -200,15 +200,15 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
-    public void readAddressBook_invalidClassSpaceAddressBook_populatesLoadWarnings() throws Exception {
-        Path filePath = addToTestDataPathIfNotNull("invalidClassSpaceAddressBook.json");
+    public void readAddressBook_invalidGroupAddressBook_populatesLoadWarnings() throws Exception {
+        Path filePath = addToTestDataPathIfNotNull("invalidGroupAddressBook.json");
         JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
 
         ReadOnlyAddressBook addressBook = storage.readAddressBook(filePath).orElseThrow();
 
-        assertEquals(1, addressBook.getClassSpaceList().size());
+        assertEquals(1, addressBook.getGroupList().size());
         assertEquals(1, storage.getLastLoadWarnings().size());
-        assertTrue(storage.getLastLoadWarnings().get(0).contains("Skipped invalid class space"));
+        assertTrue(storage.getLastLoadWarnings().get(0).contains("Skipped invalid group"));
     }
 
     @Test

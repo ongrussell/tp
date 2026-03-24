@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents a list of sessions, belonging to a class space.
+ * Represents a list of sessions, belonging to a group.
  * Allows iterating through sessions to retrieve attendance and participation.
  */
 public class SessionList implements Iterable<Session> {

@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import seedu.address.model.Model;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
 
 /**
- * Lists all class spaces.
+ * Lists all groups.
  */
 public class ListGroupsCommand extends Command {
 
@@ -22,8 +22,8 @@ public class ListGroupsCommand extends Command {
     @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
-        List<Group> groups = model.getClassSpaceList().stream()
-                .sorted(Comparator.comparing(classSpace -> classSpace.getClassSpaceName().value,
+        List<Group> groups = model.getGroupList().stream()
+                .sorted(Comparator.comparing(group -> group.getGroupName().value,
                         String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
@@ -35,7 +35,7 @@ public class ListGroupsCommand extends Command {
         for (int i = 0; i < groups.size(); i++) {
             builder.append(i + 1)
                     .append(". ")
-                    .append(groups.get(i).getClassSpaceName().value);
+                    .append(groups.get(i).getGroupName().value);
             if (i < groups.size() - 1) {
                 builder.append("\n");
             }

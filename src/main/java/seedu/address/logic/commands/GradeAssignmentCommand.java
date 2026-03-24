@@ -15,12 +15,13 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
 /**
- * Grades an assignment for one or more students in the current class space.
+ * Grades an assignment for one or more students in the current group.
  */
 public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
 
@@ -28,7 +29,7 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
     public static final String SHORT_COMMAND_WORD = "gradea";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + " (alias: " + SHORT_COMMAND_WORD + ")"
-            + ": Grades an assignment for one or more students in the current class space.\n"
+            + ": Grades an assignment for one or more students in the current group.\n"
             + "Parameters: a/ASSIGNMENT_NAME (i/INDEX_EXPRESSION | m/MATRIC_NUMBER [m/MATRIC_NUMBER]...) gr/GRADE\n"
             + "Examples: " + SHORT_COMMAND_WORD + " a/Quiz 1 i/1,3-5 gr/17\n"
             + "          " + SHORT_COMMAND_WORD + " a/Quiz 1 m/A1234567X m/A2345678Y gr/17";
@@ -66,15 +67,15 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Group activeGroup = getActiveClassSpace(model);
+        Group activeGroup = getActiveGroup(model);
         Assignment assignment = getRequiredAssignment(activeGroup, assignmentName);
         if (grade > assignment.getMaxMarks()) {
             throw new CommandException(MESSAGE_GRADE_OUT_OF_RANGE);
         }
 
-        List<Person> targetPersons = resolveTargetPersons(model, activeGroup.getClassSpaceName());
+        List<Person> targetPersons = resolveTargetPersons(model, activeGroup.getGroupName());
         for (Person person : targetPersons) {
-            Person updatedPerson = person.withUpdatedAssignmentGrade(activeGroup.getClassSpaceName(),
+            Person updatedPerson = person.withUpdatedAssignmentGrade(activeGroup.getGroupName(),
                     assignmentName, grade);
             model.setPerson(person, updatedPerson);
         }
@@ -84,7 +85,7 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
                 grade + "/" + assignment.getMaxMarks()));
     }
 
-    private List<Person> resolveTargetPersons(Model model, seedu.address.model.classspace.ClassSpaceName classSpaceName)
+    private List<Person> resolveTargetPersons(Model model, GroupName groupName)
             throws CommandException {
         Set<Person> resolvedPersons = new LinkedHashSet<>();
         if (!targetIndexes.isEmpty()) {
@@ -94,9 +95,9 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
                     throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
                 }
                 Person targetPerson = lastShownList.get(targetIndex.getZeroBased());
-                if (!targetPerson.hasClassSpace(classSpaceName)) {
+                if (!targetPerson.hasGroup(groupName)) {
                     throw new CommandException(String.format("%s is not in %s.",
-                            targetPerson.getName().fullName, classSpaceName.value));
+                            targetPerson.getName().fullName, groupName.value));
                 }
                 resolvedPersons.add(targetPerson);
             }
@@ -108,9 +109,9 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
                             matricNumber.value));
                 }
                 Person targetPerson = matchedPerson.get();
-                if (!targetPerson.hasClassSpace(classSpaceName)) {
+                if (!targetPerson.hasGroup(groupName)) {
                     throw new CommandException(String.format("%s is not in %s.",
-                            targetPerson.getName().fullName, classSpaceName.value));
+                            targetPerson.getName().fullName, groupName.value));
                 }
                 resolvedPersons.add(targetPerson);
             }

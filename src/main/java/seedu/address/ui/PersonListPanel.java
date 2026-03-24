@@ -24,8 +24,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
@@ -47,7 +47,7 @@ public class PersonListPanel extends UiPart<Region> {
     private final CommandBox.CommandExecutor commandExecutor;
     private final ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStart;
     private final ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEnd;
-    private ClassSpaceName currentActiveClassSpaceName;
+    private GroupName currentActiveGroupName;
     private LocalDate currentActiveSessionDate;
     private LocalDate currentVisibleRangeStart;
     private LocalDate currentVisibleRangeEnd;
@@ -92,7 +92,7 @@ public class PersonListPanel extends UiPart<Region> {
                            ObservableList<Person> allPersons,
                            ObservableList<Group> groups,
                            ReadOnlyBooleanProperty attendanceViewActive,
-                           ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceName,
+                           ReadOnlyObjectProperty<GroupName> activeGroupName,
                            ReadOnlyObjectProperty<LocalDate> activeSessionDate,
                            ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStart,
                            ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEnd,
@@ -106,35 +106,35 @@ public class PersonListPanel extends UiPart<Region> {
 
         personListView.setItems(personList);
         personListView.setCellFactory(listView ->
-                new PersonListViewCell(groups, attendanceViewActive, activeClassSpaceName, activeSessionDate));
+                new PersonListViewCell(groups, attendanceViewActive, activeGroupName, activeSessionDate));
 
         attendanceViewActive.addListener((observable, oldValue, newValue) -> {
             personListView.refresh();
-            refreshAttendanceMatrix(personList, attendanceViewActive.get(), activeClassSpaceName.get(),
+            refreshAttendanceMatrix(personList, attendanceViewActive.get(), activeGroupName.get(),
                     activeSessionDate.get());
         });
-        activeClassSpaceName.addListener((observable, oldValue, newValue) -> {
+        activeGroupName.addListener((observable, oldValue, newValue) -> {
             personListView.refresh();
             refreshAttendanceMatrix(personList, attendanceViewActive.get(), newValue, activeSessionDate.get());
         });
         activeSessionDate.addListener((observable, oldValue, newValue) -> {
             personListView.refresh();
-            refreshAttendanceMatrix(personList, attendanceViewActive.get(), activeClassSpaceName.get(), newValue);
+            refreshAttendanceMatrix(personList, attendanceViewActive.get(), activeGroupName.get(), newValue);
         });
         visibleSessionRangeStart.addListener((observable, oldValue, newValue) ->
                 refreshAttendanceMatrix(personList, attendanceViewActive.get(),
-                        activeClassSpaceName.get(), activeSessionDate.get()));
+                        activeGroupName.get(), activeSessionDate.get()));
         visibleSessionRangeEnd.addListener((observable, oldValue, newValue) ->
                 refreshAttendanceMatrix(personList, attendanceViewActive.get(),
-                        activeClassSpaceName.get(), activeSessionDate.get()));
+                        activeGroupName.get(), activeSessionDate.get()));
         groups.addListener((ListChangeListener<Group>) change -> personListView.refresh());
         personList.addListener((ListChangeListener<Person>) change -> refreshAttendanceMatrix(
-                personList, attendanceViewActive.get(), activeClassSpaceName.get(), activeSessionDate.get()));
+                personList, attendanceViewActive.get(), activeGroupName.get(), activeSessionDate.get()));
         allPersons.addListener((ListChangeListener<Person>) change -> refreshAttendanceMatrix(
-                personList, attendanceViewActive.get(), activeClassSpaceName.get(), activeSessionDate.get()));
+                personList, attendanceViewActive.get(), activeGroupName.get(), activeSessionDate.get()));
 
         refreshAttendanceMatrix(personList, attendanceViewActive.get(),
-                activeClassSpaceName.get(), activeSessionDate.get());
+                activeGroupName.get(), activeSessionDate.get());
     }
 
     private void configureButtons() {
@@ -143,10 +143,10 @@ public class PersonListPanel extends UiPart<Region> {
 
     private void refreshAttendanceMatrix(ObservableList<Person> personList,
                                          boolean isAttendanceViewActive,
-                                         ClassSpaceName activeClassSpaceName,
+                                         GroupName activeGroupName,
                                          LocalDate activeSessionDate) {
-        boolean showMatrix = isAttendanceViewActive && activeClassSpaceName != null;
-        currentActiveClassSpaceName = activeClassSpaceName;
+        boolean showMatrix = isAttendanceViewActive && activeGroupName != null;
+        currentActiveGroupName = activeGroupName;
         currentActiveSessionDate = activeSessionDate;
         currentVisibleRangeStart = visibleSessionRangeStart.get();
         currentVisibleRangeEnd = visibleSessionRangeEnd.get();
@@ -160,7 +160,7 @@ public class PersonListPanel extends UiPart<Region> {
             return;
         }
 
-        List<LocalDate> sessionDates = getSessionDates(activeClassSpaceName);
+        List<LocalDate> sessionDates = getSessionDates(activeGroupName);
 
         LocalDate focusDate = activeSessionDate != null
                 ? activeSessionDate
@@ -168,12 +168,12 @@ public class PersonListPanel extends UiPart<Region> {
 
         String activeSessionNote = activeSessionDate == null
                 ? ""
-                : getSessionNote(activeClassSpaceName, activeSessionDate);
-        attendanceMatrixTitle.setText(buildMatrixTitle(activeClassSpaceName, activeSessionDate));
+                : getSessionNote(activeGroupName, activeSessionDate);
+        attendanceMatrixTitle.setText(buildMatrixTitle(activeGroupName, activeSessionDate));
         attendanceMatrixSubtitle.setText(buildMatrixSubtitle(activeSessionDate, activeSessionNote));
         populateMatrixMeta(personList.size(), sessionDates.size(), activeSessionDate, activeSessionNote);
         populateLegend();
-        populateSummary(personList, activeClassSpaceName, focusDate);
+        populateSummary(personList, activeGroupName, focusDate);
         attendanceMatrixScrollHint.setVisible(sessionDates.size() > 4);
         attendanceMatrixScrollHint.setManaged(sessionDates.size() > 4);
 
@@ -190,15 +190,15 @@ public class PersonListPanel extends UiPart<Region> {
         attendanceMatrixEmptyState.setManaged(false);
         attendanceMatrixEmptyState.setVisible(false);
 
-        addHeaderRow(sessionDates, activeClassSpaceName, activeSessionDate);
-        addStudentRows(personList, activeClassSpaceName, activeSessionDate, sessionDates);
+        addHeaderRow(sessionDates, activeGroupName, activeSessionDate);
+        addStudentRows(personList, activeGroupName, activeSessionDate, sessionDates);
     }
 
-    private String buildMatrixTitle(ClassSpaceName activeClassSpaceName, LocalDate activeSessionDate) {
+    private String buildMatrixTitle(GroupName activeGroupName, LocalDate activeSessionDate) {
         if (activeSessionDate == null) {
-            return activeClassSpaceName + " Attendance Overview";
+            return activeGroupName + " Attendance Overview";
         }
-        return activeClassSpaceName + " Attendance Overview - Highlighting "
+        return activeGroupName + " Attendance Overview - Highlighting "
                 + activeSessionDate.format(MATRIX_TITLE_DATE_FORMATTER);
     }
 
@@ -212,11 +212,11 @@ public class PersonListPanel extends UiPart<Region> {
         return "Semester view with the selected session column highlighted. Click another date header to refocus.";
     }
 
-    private List<LocalDate> getSessionDates(ClassSpaceName classSpaceName) {
+    private List<LocalDate> getSessionDates(GroupName groupName) {
         return allPersons.stream()
-                .filter(person -> person.hasClassSpace(classSpaceName))
-                .flatMap(person -> person.getClassSpaceSessions()
-                        .getOrDefault(classSpaceName, new SessionList())
+                .filter(person -> person.hasGroup(groupName))
+                .flatMap(person -> person.getGroupSessions()
+                        .getOrDefault(groupName, new SessionList())
                         .getSessions()
                         .stream())
                 .map(Session::getDate)
@@ -257,7 +257,7 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private void populateSummary(ObservableList<Person> personList,
-                                 ClassSpaceName activeClassSpaceName,
+                                 GroupName activeGroupName,
                                  LocalDate focusDate) {
         if (focusDate == null) {
             attendanceMatrixSummary.setText("Create or add a session to see per-session attendance totals.");
@@ -268,7 +268,7 @@ public class PersonListPanel extends UiPart<Region> {
         int absentCount = 0;
         int uninitialisedCount = 0;
         for (Person person : personList) {
-            Attendance attendance = person.getAttendance(activeClassSpaceName, focusDate);
+            Attendance attendance = person.getAttendance(activeGroupName, focusDate);
             switch (attendance.value) {
             case PRESENT -> presentCount++;
             case ABSENT -> absentCount++;
@@ -277,14 +277,14 @@ public class PersonListPanel extends UiPart<Region> {
             }
         }
 
-        String noteSuffix = buildSessionNoteSuffix(activeClassSpaceName, focusDate);
+        String noteSuffix = buildSessionNoteSuffix(activeGroupName, focusDate);
         attendanceMatrixSummary.setText(String.format(
                 "Summary for %s%s: %d present, %d absent, %d uninitialised.",
                 focusDate.format(MATRIX_DATE_FORMATTER), noteSuffix, presentCount, absentCount, uninitialisedCount));
     }
 
     private void addHeaderRow(List<LocalDate> sessionDates,
-                              ClassSpaceName activeClassSpaceName,
+                              GroupName activeGroupName,
                               LocalDate activeSessionDate) {
         attendanceMatrixGrid.add(createHeaderLabel("Student", true, null), 0, 0);
         for (int columnIndex = 0; columnIndex < sessionDates.size(); columnIndex++) {
@@ -298,7 +298,7 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private void addStudentRows(ObservableList<Person> personList,
-                                ClassSpaceName classSpaceName,
+                                GroupName groupName,
                                 LocalDate activeSessionDate,
                                 List<LocalDate> sessionDates) {
         for (int rowIndex = 0; rowIndex < personList.size(); rowIndex++) {
@@ -318,7 +318,7 @@ public class PersonListPanel extends UiPart<Region> {
 
             for (int columnIndex = 0; columnIndex < sessionDates.size(); columnIndex++) {
                 LocalDate sessionDate = sessionDates.get(columnIndex);
-                VBox cell = createAttendanceCell(person, classSpaceName, sessionDate,
+                VBox cell = createAttendanceCell(person, groupName, sessionDate,
                         sessionDate.equals(activeSessionDate), rowStyleClass);
                 attendanceMatrixGrid.add(cell, columnIndex + 1, rowIndex + 1);
             }
@@ -341,9 +341,9 @@ public class PersonListPanel extends UiPart<Region> {
             headerLabel.setMaxWidth(96);
             headerLabel.setWrapText(true);
             headerLabel.getStyleClass().add("attendance-matrix-header-clickable");
-            String sessionNote = currentActiveClassSpaceName == null
+            String sessionNote = currentActiveGroupName == null
                     ? ""
-                    : getSessionNote(currentActiveClassSpaceName, sessionDate);
+                    : getSessionNote(currentActiveGroupName, sessionDate);
             String fullDateText = sessionDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
                     + ", " + sessionDate.format(COMMAND_DATE_FORMATTER)
                     + (sessionNote.isBlank() ? "" : "\nNote: " + sessionNote)
@@ -376,11 +376,11 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private VBox createAttendanceCell(Person person,
-                                      ClassSpaceName classSpaceName,
+                                      GroupName groupName,
                                       LocalDate sessionDate,
                                       boolean isHighlightedDate,
                                       String rowStyleClass) {
-        Attendance attendance = person.getAttendance(classSpaceName, sessionDate);
+        Attendance attendance = person.getAttendance(groupName, sessionDate);
         String attendanceShortLabel = switch (attendance.value) {
         case PRESENT -> "P";
         case ABSENT -> "A";
@@ -390,7 +390,7 @@ public class PersonListPanel extends UiPart<Region> {
         Label attendanceLabel = new Label(attendanceShortLabel);
         attendanceLabel.getStyleClass().addAll("attendance-matrix-cell-badge", attendanceStyleClass(attendance));
 
-        Label participationLabel = new Label("PV " + person.getParticipation(classSpaceName, sessionDate));
+        Label participationLabel = new Label("PV " + person.getParticipation(groupName, sessionDate));
         participationLabel.getStyleClass().add("attendance-matrix-participation");
 
         VBox cell = new VBox(4, attendanceLabel, participationLabel);
@@ -405,18 +405,18 @@ public class PersonListPanel extends UiPart<Region> {
         cell.setMinHeight(MATRIX_CELL_HEIGHT);
         cell.setPrefHeight(MATRIX_CELL_HEIGHT);
         cell.setMaxHeight(MATRIX_CELL_HEIGHT);
-        Tooltip.install(cell, new Tooltip(buildCellTooltip(person, classSpaceName, sessionDate, attendance)));
+        Tooltip.install(cell, new Tooltip(buildCellTooltip(person, groupName, sessionDate, attendance)));
         return cell;
     }
 
     private String buildCellTooltip(Person person,
-                                    ClassSpaceName classSpaceName,
+                                    GroupName groupName,
                                     LocalDate sessionDate,
                                     Attendance attendance) {
         return person.getName().fullName + "\n"
                 + sessionDate.format(COMMAND_DATE_FORMATTER) + "\n"
                 + "Attendance: " + attendance.value + "\n"
-                + "Participation: " + person.getParticipation(classSpaceName, sessionDate);
+                + "Participation: " + person.getParticipation(groupName, sessionDate);
     }
 
     private String attendanceStyleClass(Attendance attendance) {
@@ -427,15 +427,15 @@ public class PersonListPanel extends UiPart<Region> {
         };
     }
 
-    private String buildSessionNoteSuffix(ClassSpaceName classSpaceName, LocalDate sessionDate) {
-        String sessionNote = getSessionNote(classSpaceName, sessionDate);
+    private String buildSessionNoteSuffix(GroupName groupName, LocalDate sessionDate) {
+        String sessionNote = getSessionNote(groupName, sessionDate);
         return sessionNote.isBlank() ? "" : " (" + sessionNote + ")";
     }
 
-    private String getSessionNote(ClassSpaceName classSpaceName, LocalDate sessionDate) {
+    private String getSessionNote(GroupName groupName, LocalDate sessionDate) {
         return allPersons.stream()
-                .filter(person -> person.hasClassSpace(classSpaceName))
-                .map(person -> person.getSessionNote(classSpaceName, sessionDate))
+                .filter(person -> person.hasGroup(groupName))
+                .map(person -> person.getSessionNote(groupName, sessionDate))
                 .filter(note -> !note.isBlank())
                 .findFirst()
                 .orElse("");
@@ -455,16 +455,16 @@ public class PersonListPanel extends UiPart<Region> {
     class PersonListViewCell extends ListCell<Person> {
         private final ObservableList<Group> groups;
         private final ReadOnlyBooleanProperty attendanceViewActive;
-        private final ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceName;
+        private final ReadOnlyObjectProperty<GroupName> activeGroupName;
         private final ReadOnlyObjectProperty<LocalDate> activeSessionDate;
 
         PersonListViewCell(ObservableList<Group> groups,
                            ReadOnlyBooleanProperty attendanceViewActive,
-                           ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceName,
+                           ReadOnlyObjectProperty<GroupName> activeGroupName,
                            ReadOnlyObjectProperty<LocalDate> activeSessionDate) {
             this.groups = groups;
             this.attendanceViewActive = attendanceViewActive;
-            this.activeClassSpaceName = activeClassSpaceName;
+            this.activeGroupName = activeGroupName;
             this.activeSessionDate = activeSessionDate;
         }
 
@@ -477,7 +477,7 @@ public class PersonListPanel extends UiPart<Region> {
                 setText(null);
             } else {
                 setGraphic(new PersonCard(person, getIndex() + 1, attendanceViewActive.get(),
-                        activeClassSpaceName.get(), activeSessionDate.get(), groups).getRoot());
+                        activeGroupName.get(), activeSessionDate.get(), groups).getRoot());
             }
         }
     }

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.AddSessionCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new AddSessionCommand object.
@@ -28,8 +28,8 @@ public class AddSessionCommandParser implements Parser<AddSessionCommand> {
         LocalDate sessionDate = ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get());
         String note = argMultimap.getValue(PREFIX_NOTE).map(String::trim).orElse("");
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-            ClassSpaceName classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
-            return new AddSessionCommand(sessionDate, classSpaceName, note);
+            GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+            return new AddSessionCommand(sessionDate, groupName, note);
         }
         return new AddSessionCommand(sessionDate, note);
     }

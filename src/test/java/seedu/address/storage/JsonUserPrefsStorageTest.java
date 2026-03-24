@@ -123,7 +123,7 @@ public class JsonUserPrefsStorageTest {
     @Test
     public void saveUserPrefs_viewContextFields_success() throws DataLoadingException, IOException {
         UserPrefs original = new UserPrefs();
-        original.setLastActiveClassSpaceName("T01");
+        original.setLastActiveGroupName("T01");
         original.setLastActiveSessionDate("2026-03-16");
         original.setAttendanceViewActive(true);
 

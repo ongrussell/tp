@@ -31,7 +31,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
     private List<String> lastLoadWarnings = new ArrayList<>();
     private List<JsonNode> lastSkippedPersons = new ArrayList<>();
-    private List<JsonNode> lastSkippedClassSpaces = new ArrayList<>();
+    private List<JsonNode> lastSkippedGroups = new ArrayList<>();
     private boolean shouldSkipSaveAfterFatalLoad = false;
 
     public JsonAddressBookStorage(Path filePath) {
@@ -72,7 +72,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
         lastLoadWarnings = new ArrayList<>();
         lastSkippedPersons = new ArrayList<>();
-        lastSkippedClassSpaces = new ArrayList<>();
+        lastSkippedGroups = new ArrayList<>();
         shouldSkipSaveAfterFatalLoad = false;
         try {
             Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
@@ -84,7 +84,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
             ReadOnlyAddressBook result = serializable.toModelType();
             lastLoadWarnings.addAll(serializable.getLoadWarnings());
             lastSkippedPersons.addAll(serializable.getPreservedSkippedPersons());
-            lastSkippedClassSpaces.addAll(serializable.getPreservedSkippedClassSpaces());
+            lastSkippedGroups.addAll(serializable.getPreservedSkippedGroups());
             return Optional.of(result);
         } catch (IllegalValueException | DataLoadingException e) {
             shouldSkipSaveAfterFatalLoad = true;
@@ -114,7 +114,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
         FileUtil.createIfMissing(filePath);
         JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons,
-                lastSkippedClassSpaces, lastLoadWarnings), filePath);
+                lastSkippedGroups, lastLoadWarnings), filePath);
     }
 
 }

@@ -12,7 +12,7 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
 /**
@@ -41,8 +41,8 @@ public interface Logic {
     /** Returns the current view label property. */
     ReadOnlyStringProperty currentViewProperty();
 
-    /** Returns the active class space property. */
-    ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty();
+    /** Returns the active group property. */
+    ReadOnlyObjectProperty<GroupName> activeGroupNameProperty();
 
     /** Returns the active session date property. */
     ReadOnlyObjectProperty<LocalDate> activeSessionDateProperty();

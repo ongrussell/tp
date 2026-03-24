@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
 /**
- * Removes one or more students from a class space.
+ * Removes one or more students from a group.
  */
 public class RemoveFromGroupCommand extends GroupMembershipCommand {
 
@@ -27,28 +27,28 @@ public class RemoveFromGroupCommand extends GroupMembershipCommand {
 
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
 
-    private RemoveFromGroupCommand(ClassSpaceName classSpaceName, List<Index> targetIndexes) {
-        super(classSpaceName, targetIndexes);
+    private RemoveFromGroupCommand(GroupName groupName, List<Index> targetIndexes) {
+        super(groupName, targetIndexes);
     }
 
-    private RemoveFromGroupCommand(ClassSpaceName classSpaceName, List<MatricNumber> targetMatricNumbers,
+    private RemoveFromGroupCommand(GroupName groupName, List<MatricNumber> targetMatricNumbers,
                                    boolean useMatricNumbers) {
-        super(classSpaceName, targetMatricNumbers, useMatricNumbers);
+        super(groupName, targetMatricNumbers, useMatricNumbers);
     }
 
-    public static RemoveFromGroupCommand forIndexes(ClassSpaceName classSpaceName, List<Index> targetIndexes) {
-        return new RemoveFromGroupCommand(classSpaceName, targetIndexes);
+    public static RemoveFromGroupCommand forIndexes(GroupName groupName, List<Index> targetIndexes) {
+        return new RemoveFromGroupCommand(groupName, targetIndexes);
     }
 
-    public static RemoveFromGroupCommand forMatricNumbers(ClassSpaceName classSpaceName,
-                                                           List<MatricNumber> targetMatricNumbers) {
-        return new RemoveFromGroupCommand(classSpaceName, targetMatricNumbers, true);
+    public static RemoveFromGroupCommand forMatricNumbers(GroupName groupName,
+                                                          List<MatricNumber> targetMatricNumbers) {
+        return new RemoveFromGroupCommand(groupName, targetMatricNumbers, true);
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        if (model.findClassSpaceByName(classSpaceName).isEmpty()) {
+        if (model.findGroupByName(groupName).isEmpty()) {
             throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
         }
 
@@ -57,12 +57,12 @@ public class RemoveFromGroupCommand extends GroupMembershipCommand {
         List<String> notMembers = new ArrayList<>();
 
         for (Person person : targetPersons) {
-            if (!person.hasClassSpace(classSpaceName)) {
+            if (!person.hasGroup(groupName)) {
                 notMembers.add(person.getName().fullName);
                 continue;
             }
 
-            Person updatedPerson = person.withoutClassSpaceData(classSpaceName);
+            Person updatedPerson = person.withoutGroupData(groupName);
             model.setPerson(person, updatedPerson);
             removedStudents.add(person.getName().fullName);
         }
@@ -73,13 +73,13 @@ public class RemoveFromGroupCommand extends GroupMembershipCommand {
     private String buildFeedbackMessage(List<String> removedStudents, List<String> notMembers) {
         List<String> feedbackParts = new ArrayList<>();
         if (!removedStudents.isEmpty()) {
-            feedbackParts.add(String.format("Removed %s from %s.", joinNames(removedStudents), classSpaceName.value));
+            feedbackParts.add(String.format("Removed %s from %s.", joinNames(removedStudents), groupName.value));
         }
         if (!notMembers.isEmpty()) {
-            feedbackParts.add(String.format("Not in %s: %s.", classSpaceName.value, joinNames(notMembers)));
+            feedbackParts.add(String.format("Not in %s: %s.", groupName.value, joinNames(notMembers)));
         }
         if (feedbackParts.isEmpty()) {
-            return String.format("No students were removed from %s.", classSpaceName.value);
+            return String.format("No students were removed from %s.", groupName.value);
         }
         return String.join(" ", feedbackParts);
     }

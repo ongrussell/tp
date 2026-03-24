@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.logic.parser.Prefix;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
 /**
@@ -58,13 +58,13 @@ public class Messages {
     }
 
     /**
-     * Formats the {@code person} for a specific class space and session date.
+     * Formats the {@code person} for a specific group and session date.
      */
-    public static String format(Person person, ClassSpaceName classSpaceName, LocalDate date) {
+    public static String format(Person person, GroupName groupName, LocalDate date) {
         final StringBuilder builder = new StringBuilder();
         builder.append(person.getName())
                 .append("; Attendance: ")
-                .append(person.getAttendance(classSpaceName, date))
+                .append(person.getAttendance(groupName, date))
                 .append("; Phone: ")
                 .append(person.getPhone())
                 .append("; Email: ")
@@ -72,7 +72,7 @@ public class Messages {
                 .append("; Matric Number: ")
                 .append(person.getMatricNumber())
                 .append("; Participation: ")
-                .append(person.getParticipation(classSpaceName, date))
+                .append(person.getParticipation(groupName, date))
                 .append("; Tags: ");
         return getString(person, builder);
     }
@@ -80,9 +80,9 @@ public class Messages {
     private static String getString(Person person, StringBuilder builder) {
         person.getTags().forEach(builder::append);
         builder.append("; Groups: ");
-        builder.append(person.getClassSpaces().stream()
-                .sorted(Comparator.comparing(classSpaceName -> classSpaceName.value, String.CASE_INSENSITIVE_ORDER))
-                .map(classSpaceName -> classSpaceName.value)
+        builder.append(person.getGroups().stream()
+                .sorted(Comparator.comparing(groupName -> groupName.value, String.CASE_INSENSITIVE_ORDER))
+                .map(groupName -> groupName.value)
                 .collect(Collectors.joining(", ")));
         return builder.toString();
     }

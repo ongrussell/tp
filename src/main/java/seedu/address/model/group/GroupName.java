@@ -1,13 +1,13 @@
-package seedu.address.model.classspace;
+package seedu.address.model.group;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
- * Represents the name of a class space.
- * Guarantees: immutable; is valid as declared in {@link #isValidClassSpaceName(String)}.
+ * Represents the name of a group.
+ * Guarantees: immutable; is valid as declared in {@link #isValidGroupName(String)}.
  */
-public class ClassSpaceName {
+public class GroupName {
 
     public static final String MESSAGE_CONSTRAINTS = "Group names should only contain letters, numbers, "
             + "spaces, hyphens, and underscores, and it should not be blank.";
@@ -16,19 +16,19 @@ public class ClassSpaceName {
     public final String value;
 
     /**
-     * Constructs a {@code ClassSpaceName}.
+     * Constructs a {@code GroupName}.
      */
-    public ClassSpaceName(String name) {
+    public GroupName(String name) {
         requireNonNull(name);
         String trimmedName = name.trim();
-        checkArgument(isValidClassSpaceName(trimmedName), MESSAGE_CONSTRAINTS);
+        checkArgument(isValidGroupName(trimmedName), MESSAGE_CONSTRAINTS);
         value = trimmedName;
     }
 
     /**
-     * Returns true if a given string is a valid class space name.
+     * Returns true if a given string is a valid group name.
      */
-    public static boolean isValidClassSpaceName(String test) {
+    public static boolean isValidGroupName(String test) {
         return test != null && test.trim().matches(VALIDATION_REGEX);
     }
 
@@ -43,11 +43,11 @@ public class ClassSpaceName {
             return true;
         }
 
-        if (!(other instanceof ClassSpaceName)) {
+        if (!(other instanceof GroupName)) {
             return false;
         }
 
-        ClassSpaceName otherName = (ClassSpaceName) other;
+        GroupName otherName = (GroupName) other;
         return value.equalsIgnoreCase(otherName.value);
     }
 

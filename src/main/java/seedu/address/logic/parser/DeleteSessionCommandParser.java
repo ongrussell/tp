@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.DeleteSessionCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new DeleteSessionCommand object.
@@ -30,8 +30,8 @@ public class DeleteSessionCommandParser implements Parser<DeleteSessionCommand> 
         LocalDate sessionDate = ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get());
         boolean confirmed = preamble.equalsIgnoreCase("confirm");
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-            ClassSpaceName classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
-            return new DeleteSessionCommand(sessionDate, Optional.of(classSpaceName), confirmed);
+            GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+            return new DeleteSessionCommand(sessionDate, Optional.of(groupName), confirmed);
         }
         return new DeleteSessionCommand(sessionDate, Optional.empty(), confirmed);
     }

@@ -4,10 +4,10 @@ import static java.util.Objects.requireNonNull;
 
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
 
 /**
- * Creates a new class space.
+ * Creates a new group.
  */
 public class CreateGroupCommand extends Command {
 
@@ -29,11 +29,11 @@ public class CreateGroupCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        if (model.hasClassSpace(group)) {
+        if (model.hasGroup(group)) {
             throw new CommandException(MESSAGE_DUPLICATE_GROUP);
         }
-        model.addClassSpace(group);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, group.getClassSpaceName().value));
+        model.addGroup(group);
+        return new CommandResult(String.format(MESSAGE_SUCCESS, group.getGroupName().value));
     }
 
     @Override

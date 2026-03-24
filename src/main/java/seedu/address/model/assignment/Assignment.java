@@ -8,7 +8,7 @@ import java.util.Objects;
 import seedu.address.commons.util.ToStringBuilder;
 
 /**
- * Represents an assignment belonging to a class space.
+ * Represents an assignment belonging to a group.
  */
 public class Assignment {
 

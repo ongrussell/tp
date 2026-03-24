@@ -16,7 +16,7 @@ import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -154,15 +154,15 @@ public class ParserUtil {
         }
     }
     /**
-     * Parses a class space name.
+     * Parses a group name.
      */
-    public static ClassSpaceName parseClassSpaceName(String classSpaceName) throws ParseException {
-        requireNonNull(classSpaceName);
-        String trimmedClassSpaceName = classSpaceName.trim();
-        if (!ClassSpaceName.isValidClassSpaceName(trimmedClassSpaceName)) {
-            throw new ParseException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+    public static GroupName parseGroupName(String groupName) throws ParseException {
+        requireNonNull(groupName);
+        String trimmedGroupName = groupName.trim();
+        if (!GroupName.isValidGroupName(trimmedGroupName)) {
+            throw new ParseException(GroupName.MESSAGE_CONSTRAINTS);
         }
-        return new ClassSpaceName(trimmedClassSpaceName);
+        return new GroupName(trimmedGroupName);
     }
 
     /**

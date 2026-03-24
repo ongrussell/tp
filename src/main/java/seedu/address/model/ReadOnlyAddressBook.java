@@ -1,7 +1,7 @@
 package seedu.address.model;
 
 import javafx.collections.ObservableList;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
 import seedu.address.model.person.Person;
 
 /**
@@ -16,9 +16,9 @@ public interface ReadOnlyAddressBook {
     ObservableList<Person> getPersonList();
 
     /**
-     * Returns an unmodifiable view of the class space list.
-     * This list will not contain any duplicate class spaces.
+     * Returns an unmodifiable view of the group list.
+     * This list will not contain any duplicate groups.
      */
-    ObservableList<Group> getClassSpaceList();
+    ObservableList<Group> getGroupList();
 
 }

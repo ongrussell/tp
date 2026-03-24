@@ -5,7 +5,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_GROUP;
 
 import seedu.address.logic.commands.SwitchGroupCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new SwitchGroupCommand object.
@@ -25,7 +25,7 @@ public class SwitchGroupCommandParser implements Parser<SwitchGroupCommand> {
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_GROUP);
-        ClassSpaceName classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
-        return new SwitchGroupCommand(classSpaceName);
+        GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+        return new SwitchGroupCommand(groupName);
     }
 }

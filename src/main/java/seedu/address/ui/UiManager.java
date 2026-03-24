@@ -24,8 +24,8 @@ public class UiManager implements Ui {
     private static final String ICON_APPLICATION = "/images/address_book_32.png";
     private static final String INVALID_CONTACT_PREFIX = "Skipped invalid contact";
     private static final String DUPLICATE_CONTACT_PREFIX = "Skipped duplicate contact";
-    private static final String INVALID_CLASS_SPACE_PREFIX = "Skipped invalid class space";
-    private static final String DUPLICATE_CLASS_SPACE_PREFIX = "Skipped duplicate class space";
+    private static final String INVALID_GROUP_PREFIX = "Skipped invalid group";
+    private static final String DUPLICATE_GROUP_PREFIX = "Skipped duplicate group";
     private static final String LINE_SEPARATOR = "\n";
     private static final String FATAL_PREFIX = "FATAL:";
 
@@ -80,7 +80,7 @@ public class UiManager implements Ui {
 
         appendFatalErrorSection(message, warnings);
         appendContactWarningSection(message, warnings);
-        appendClassSpaceWarningSection(message, warnings);
+        appendGroupWarningSection(message, warnings);
 
         return message.toString();
     }
@@ -113,14 +113,14 @@ public class UiManager implements Ui {
         message.append(buildSkippedSection("contact", contactWarnings));
     }
 
-    private void appendClassSpaceWarningSection(StringBuilder message, List<String> warnings) {
-        List<String> classSpaceWarnings = getClassSpaceWarnings(warnings);
-        if (classSpaceWarnings.isEmpty()) {
+    private void appendGroupWarningSection(StringBuilder message, List<String> warnings) {
+        List<String> groupWarnings = getGroupWarnings(warnings);
+        if (groupWarnings.isEmpty()) {
             return;
         }
 
         appendSectionSpacing(message);
-        message.append(buildSkippedSection("class space", classSpaceWarnings));
+        message.append(buildSkippedSection("group", groupWarnings));
     }
 
     /**
@@ -136,14 +136,14 @@ public class UiManager implements Ui {
     }
 
     /**
-     * Returns only the warnings related to class spaces.
+     * Returns only the warnings related to groups.
      *
      * @param warnings All warnings collected during loading.
      * @return Class-space-related warnings.
      */
-    private List<String> getClassSpaceWarnings(List<String> warnings) {
+    private List<String> getGroupWarnings(List<String> warnings) {
         return warnings.stream()
-                .filter(this::isClassSpaceWarning)
+                .filter(this::isGroupWarning)
                 .toList();
     }
 
@@ -159,18 +159,18 @@ public class UiManager implements Ui {
     }
 
     /**
-     * Returns true if the warning is related to a class space.
+     * Returns true if the warning is related to a group.
      *
      * @param warning Warning message to check.
-     * @return True if the warning is a class space warning.
+     * @return True if the warning is a group warning.
      */
-    private boolean isClassSpaceWarning(String warning) {
-        return warning.startsWith(INVALID_CLASS_SPACE_PREFIX)
-                || warning.startsWith(DUPLICATE_CLASS_SPACE_PREFIX);
+    private boolean isGroupWarning(String warning) {
+        return warning.startsWith(INVALID_GROUP_PREFIX)
+                || warning.startsWith(DUPLICATE_GROUP_PREFIX);
     }
 
     /**
-     * Builds one skipped-entry section, such as contacts or class spaces.
+     * Builds one skipped-entry section, such as contacts or groups.
      *
      * @param itemType Type of item skipped.
      * @param warnings Warnings for that item type.

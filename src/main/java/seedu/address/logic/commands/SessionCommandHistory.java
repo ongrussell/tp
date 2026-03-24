@@ -6,7 +6,7 @@ import java.util.Optional;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Stores the previous state for session-specific undo.
@@ -22,7 +22,7 @@ public final class SessionCommandHistory {
     public static void record(Model model, String description) {
         lastSnapshot = new SessionCommandSnapshot(
                 new AddressBook(model.getAddressBook()),
-                model.getActiveClassSpaceName(),
+                model.getActiveGroupName(),
                 model.getActiveSessionDate(),
                 model.isAttendanceViewActive(),
                 model.getVisibleSessionRangeStart(),
@@ -42,7 +42,7 @@ public final class SessionCommandHistory {
      * Snapshot of the state needed to undo a session-related command.
      */
     public record SessionCommandSnapshot(ReadOnlyAddressBook addressBook,
-                                         Optional<ClassSpaceName> activeClassSpaceName,
+                                         Optional<GroupName> activeGroupName,
                                          Optional<LocalDate> activeSessionDate,
                                          boolean attendanceViewActive,
                                          Optional<LocalDate> visibleRangeStart,

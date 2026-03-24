@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.RenameGroupCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new RenameGroupCommand object.
@@ -23,8 +23,8 @@ public class RenameGroupCommandParser implements Parser<RenameGroupCommand> {
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_GROUP, PREFIX_NEW_NAME);
-        ClassSpaceName targetName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
-        ClassSpaceName newName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_NEW_NAME).get());
+        GroupName targetName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+        GroupName newName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_NEW_NAME).get());
         return new RenameGroupCommand(targetName, newName);
     }
 

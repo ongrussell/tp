@@ -22,8 +22,8 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
 /**
@@ -33,37 +33,37 @@ import seedu.address.model.person.Person;
 class JsonSerializableAddressBook {
 
     public static final String MESSAGE_DUPLICATE_PERSON = "Persons list contains duplicate person(s).";
-    public static final String MESSAGE_DUPLICATE_CLASS_SPACE = "Group list contains duplicate group(s).";
+    public static final String MESSAGE_DUPLICATE_GROUP = "Group list contains duplicate group(s).";
     public static final String MESSAGE_INVALID_MATRICULATION_NUMBER = "Invalid matriculation number.";
     private static final Logger logger = LogsCenter.getLogger(JsonSerializableAddressBook.class);
 
     private final List<JsonNode> persons = new ArrayList<>();
     private final List<JsonNode> preservedSkippedPersons = new ArrayList<>();
-    private final List<JsonNode> classSpaces = new ArrayList<>();
-    private final List<JsonNode> preservedSkippedClassSpaces = new ArrayList<>();
+    private final List<JsonNode> groups = new ArrayList<>();
+    private final List<JsonNode> preservedSkippedGroups = new ArrayList<>();
     private final List<String> loadWarnings = new ArrayList<>();
 
     /**
-     * Constructs a {@code JsonSerializableAddressBook} with the given persons and class spaces.
+     * Constructs a {@code JsonSerializableAddressBook} with the given persons and groups.
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonNode> persons,
-                                       @JsonProperty("classSpaces") List<JsonNode> classSpaces,
+                                       @JsonProperty("groups") List<JsonNode> groups,
                                        @JsonProperty("preservedSkippedPersons") List<JsonNode> preservedSkippedPersons,
-                                       @JsonProperty("preservedSkippedClassSpaces") List<JsonNode>
-                                                   preservedSkippedClassSpaces,
+                                       @JsonProperty("preservedSkippedGroups") List<JsonNode>
+                                                   preservedSkippedGroups,
                                        @JsonProperty("loadWarnings") List<String> loadWarnings) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
-        if (classSpaces != null) {
-            this.classSpaces.addAll(classSpaces);
+        if (groups != null) {
+            this.groups.addAll(groups);
         }
         if (preservedSkippedPersons != null) {
             this.preservedSkippedPersons.addAll(preservedSkippedPersons);
         }
-        if (preservedSkippedClassSpaces != null) {
-            this.preservedSkippedClassSpaces.addAll(preservedSkippedClassSpaces);
+        if (preservedSkippedGroups != null) {
+            this.preservedSkippedGroups.addAll(preservedSkippedGroups);
         }
         if (loadWarnings != null) {
             this.loadWarnings.addAll(loadWarnings);
@@ -97,7 +97,7 @@ class JsonSerializableAddressBook {
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source,
                                        List<JsonNode> preservedSkippedPersons,
-                                       List<JsonNode> preservedSkippedClassSpaces,
+                                       List<JsonNode> preservedSkippedGroups,
                                        List<String> preservedLoadWarnings) {
         persons.addAll(source.getPersonList().stream()
                 .map(JsonAdaptedPerson::new)
@@ -108,13 +108,13 @@ class JsonSerializableAddressBook {
                 this.preservedSkippedPersons.add(skippedPerson.deepCopy());
             }
         }
-        classSpaces.addAll(source.getClassSpaceList().stream()
-                .map(JsonAdaptedClassSpace::new)
+        groups.addAll(source.getGroupList().stream()
+                .map(JsonAdaptedGroup::new)
                 .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
-        if (preservedSkippedClassSpaces != null) {
-            for (JsonNode skippedClassSpace : preservedSkippedClassSpaces) {
-                this.preservedSkippedClassSpaces.add(skippedClassSpace.deepCopy());
+        if (preservedSkippedGroups != null) {
+            for (JsonNode skippedGroup : preservedSkippedGroups) {
+                this.preservedSkippedGroups.add(skippedGroup.deepCopy());
             }
         }
         if (preservedLoadWarnings != null) {
@@ -141,12 +141,12 @@ class JsonSerializableAddressBook {
     }
 
     /**
-     * Returns the raw skipped class space entries that should be preserved on the next save.
+     * Returns the raw skipped group entries that should be preserved on the next save.
      *
-     * @return Unmodifiable list of skipped class space JSON nodes.
+     * @return Unmodifiable list of skipped group JSON nodes.
      */
-    public List<JsonNode> getPreservedSkippedClassSpaces() {
-        return Collections.unmodifiableList(preservedSkippedClassSpaces);
+    public List<JsonNode> getPreservedSkippedGroups() {
+        return Collections.unmodifiableList(preservedSkippedGroups);
     }
 
     /**
@@ -159,10 +159,10 @@ class JsonSerializableAddressBook {
         List<String> previousWarnings = new ArrayList<>(loadWarnings);
         loadWarnings.clear();
 
-        logger.info("Loading address book: " + classSpaces.size() + " class space(s), "
+        logger.info("Loading address book: " + groups.size() + " group(s), "
                 + persons.size() + " person(s)");
 
-        loadClassSpaces(addressBook);
+        loadGroups(addressBook);
         loadPersons(addressBook);
         loadWarnings.addAll(0, previousWarnings);
 
@@ -191,9 +191,9 @@ class JsonSerializableAddressBook {
                 skipDuplicatePerson(rawPersonNode, person, index);
                 return;
             }
-            ensureClassSpacesExist(addressBook, person);
+            ensureGroupsExist(addressBook, person);
             validateAssignmentGrades(addressBook, person);
-            validateClassSpaceSessions(addressBook, person);
+            validateGroupSessions(addressBook, person);
             addressBook.addPerson(person);
         } catch (IllegalValueException | JsonProcessingException e) {
             skipInvalidPerson(rawPersonNode, index, e.getMessage());
@@ -216,36 +216,36 @@ class JsonSerializableAddressBook {
     }
 
     private void validateAssignmentGrades(AddressBook addressBook, Person person) throws IllegalValueException {
-        for (var classSpaceEntry : person.getAssignmentGrades().entrySet()) {
-            ClassSpaceName classSpaceName = classSpaceEntry.getKey();
-            Map<AssignmentName, Integer> grades = classSpaceEntry.getValue();
+        for (var groupEntry : person.getAssignmentGrades().entrySet()) {
+            GroupName groupName = groupEntry.getKey();
+            Map<AssignmentName, Integer> grades = groupEntry.getValue();
 
-            validatePersonIsMemberOfClassSpace(person, classSpaceName);
+            validatePersonIsMemberOfGroup(person, groupName);
             /*
-            This should never be reached as ensureClassSpacesExist guarantees the class space
+            This should never be reached as ensureGroupsExist guarantees the group
             exists before this method is called. The orElseThrow is a defensive guard against
             future errors in the load sequence.
              */
-            Group group = addressBook.getClassSpaceList().stream()
-                    .filter(cs -> cs.getClassSpaceName().equals(classSpaceName))
+            Group group = addressBook.getGroupList().stream()
+                    .filter(cs -> cs.getGroupName().equals(groupName))
                     .findFirst()
                     .orElseThrow(() ->
-                            new AssertionError("Class space '" + classSpaceName.value
-                                    + "' should exist after ensureClassSpacesExist"));
-            validateGradesAgainstClassSpace(group, classSpaceName, grades);
+                            new AssertionError("Group '" + groupName.value
+                                    + "' should exist after ensureGroupsExist"));
+            validateGradesAgainstGroup(group, groupName, grades);
         }
     }
 
-    private void validatePersonIsMemberOfClassSpace(Person person, ClassSpaceName classSpaceName)
+    private void validatePersonIsMemberOfGroup(Person person, GroupName groupName)
             throws IllegalValueException {
-        if (!person.getClassSpaces().contains(classSpaceName)) {
+        if (!person.getGroups().contains(groupName)) {
             throw new IllegalValueException(String.format(
-                    "Person has grades for class space '%s' but is not a member of it.",
-                    classSpaceName.value));
+                    "Person has grades for group '%s' but is not a member of it.",
+                    groupName.value));
         }
     }
 
-    private void validateGradesAgainstClassSpace(Group group, ClassSpaceName classSpaceName,
+    private void validateGradesAgainstGroup(Group group, GroupName groupName,
                                                  Map<AssignmentName, Integer> grades) throws IllegalValueException {
         for (var gradeEntry : grades.entrySet()) {
             AssignmentName assignmentName = gradeEntry.getKey();
@@ -253,26 +253,26 @@ class JsonSerializableAddressBook {
 
             if (!group.hasAssignment(assignmentName)) {
                 throw new IllegalValueException(String.format(
-                        "Person has a grade for assignment '%s' in class space '%s',"
+                        "Person has a grade for assignment '%s' in group '%s',"
                                 + "but that assignment does not exist.",
-                        assignmentName.value, classSpaceName.value));
+                        assignmentName.value, groupName.value));
             }
 
             Assignment assignment = group.findAssignmentByName(assignmentName).get();
             if (grade > assignment.getMaxMarks()) {
                 throw new IllegalValueException(String.format(
-                        "Grade %d for assignment '%s' in class space '%s' exceeds max marks of %d.",
-                        grade, assignmentName.value, classSpaceName.value, assignment.getMaxMarks()));
+                        "Grade %d for assignment '%s' in group '%s' exceeds max marks of %d.",
+                        grade, assignmentName.value, groupName.value, assignment.getMaxMarks()));
             }
         }
     }
 
-    private void validateClassSpaceSessions(AddressBook addressBook, Person person) throws IllegalValueException {
-        for (ClassSpaceName classSpaceName : person.getClassSpaceSessions().keySet()) {
-            if (!person.getClassSpaces().contains(classSpaceName)) {
+    private void validateGroupSessions(AddressBook addressBook, Person person) throws IllegalValueException {
+        for (GroupName groupName : person.getGroupSessions().keySet()) {
+            if (!person.getGroups().contains(groupName)) {
                 throw new IllegalValueException(String.format(
-                        "Person has sessions for class space '%s' but is not a member of it.",
-                        classSpaceName.value));
+                        "Person has sessions for group '%s' but is not a member of it.",
+                        groupName.value));
             }
         }
     }
@@ -285,52 +285,52 @@ class JsonSerializableAddressBook {
         return "entry #" + (index + 1) + " (missing name)";
     }
 
-    private void ensureClassSpacesExist(AddressBook addressBook, Person person) {
-        for (var classSpaceName : person.getClassSpaces()) {
-            Group group = new Group(classSpaceName);
-            if (!addressBook.hasClassSpace(group)) {
-                addressBook.addClassSpace(group);
+    private void ensureGroupsExist(AddressBook addressBook, Person person) {
+        for (var groupName : person.getGroups()) {
+            Group group = new Group(groupName);
+            if (!addressBook.hasGroup(group)) {
+                addressBook.addGroup(group);
             }
         }
     }
 
-    private void loadClassSpaces(AddressBook addressBook) {
+    private void loadGroups(AddressBook addressBook) {
         requireNonNull(addressBook);
-        for (int i = 0; i < classSpaces.size(); i++) {
-            loadClassSpace(addressBook, classSpaces.get(i), i);
+        for (int i = 0; i < groups.size(); i++) {
+            loadGroup(addressBook, groups.get(i), i);
         }
     }
 
-    private void loadClassSpace(AddressBook addressBook, JsonNode rawClassSpaceNode, int index) {
+    private void loadGroup(AddressBook addressBook, JsonNode rawGroupNode, int index) {
         requireNonNull(addressBook);
-        requireNonNull(rawClassSpaceNode);
-        assert index >= 0 : "Class space index should never be negative";
+        requireNonNull(rawGroupNode);
+        assert index >= 0 : "Group index should never be negative";
 
         try {
-            JsonAdaptedClassSpace jsonAdaptedClassSpace =
-                    JsonUtil.fromJsonNode(rawClassSpaceNode, JsonAdaptedClassSpace.class);
-            Group group = jsonAdaptedClassSpace.toModelType();
+            JsonAdaptedGroup jsonAdaptedGroup =
+                    JsonUtil.fromJsonNode(rawGroupNode, JsonAdaptedGroup.class);
+            Group group = jsonAdaptedGroup.toModelType();
 
-            if (addressBook.hasClassSpace(group)) {
-                String identifier = "'" + group.getClassSpaceName().value + "'";
-                logger.warning("Skipping duplicate class space at entry #" + (index + 1) + ": " + identifier);
-                preservedSkippedClassSpaces.add(rawClassSpaceNode.deepCopy());
-                loadWarnings.add("Skipped duplicate class space: " + identifier);
+            if (addressBook.hasGroup(group)) {
+                String identifier = "'" + group.getGroupName().value + "'";
+                logger.warning("Skipping duplicate group at entry #" + (index + 1) + ": " + identifier);
+                preservedSkippedGroups.add(rawGroupNode.deepCopy());
+                loadWarnings.add("Skipped duplicate group: " + identifier);
                 return;
             }
 
-            addressBook.addClassSpace(group);
+            addressBook.addGroup(group);
         } catch (IllegalValueException | JsonProcessingException e) {
-            String identifier = getRawClassSpaceIdentifier(rawClassSpaceNode, index);
-            String formattedWarning = formatInvalidClassSpaceWarning(identifier, e.getMessage());
+            String identifier = getRawGroupIdentifier(rawGroupNode, index);
+            String formattedWarning = formatInvalidGroupWarning(identifier, e.getMessage());
             logger.warning(formattedWarning);
-            preservedSkippedClassSpaces.add(rawClassSpaceNode.deepCopy());
+            preservedSkippedGroups.add(rawGroupNode.deepCopy());
             loadWarnings.add(formattedWarning);
         }
     }
 
-    private String getRawClassSpaceIdentifier(JsonNode rawClassSpaceNode, int index) {
-        JsonNode nameNode = rawClassSpaceNode.get("name");
+    private String getRawGroupIdentifier(JsonNode rawGroupNode, int index) {
+        JsonNode nameNode = rawGroupNode.get("name");
         if (nameNode != null && !nameNode.isNull()) {
             return "'" + nameNode.asText() + "'";
         }
@@ -352,10 +352,10 @@ class JsonSerializableAddressBook {
         return sb.toString().trim();
     }
 
-    private String formatInvalidClassSpaceWarning(String identifier, String errorMessage) {
+    private String formatInvalidGroupWarning(String identifier, String errorMessage) {
         String[] errors = errorMessage.split(";\\s*");
 
-        StringBuilder sb = new StringBuilder("Skipped invalid class space ")
+        StringBuilder sb = new StringBuilder("Skipped invalid group ")
                 .append(identifier)
                 .append(":\n");
 

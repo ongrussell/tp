@@ -10,8 +10,8 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
@@ -91,34 +91,34 @@ public interface Model {
     void setPerson(Person target, Person editedPerson);
 
     /**
-     * Returns true if a class space with the same identity as {@code group} exists in the address book.
+     * Returns true if a group with the same identity as {@code group} exists in the address book.
      */
-    boolean hasClassSpace(Group group);
+    boolean hasGroup(Group group);
 
     /**
-     * Returns the class space with the given name if it exists.
+     * Returns the group with the given name if it exists.
      */
-    Optional<Group> findClassSpaceByName(ClassSpaceName classSpaceName);
+    Optional<Group> findGroupByName(GroupName groupName);
 
     /**
-     * Adds the given class space.
+     * Adds the given group.
      * {@code group} must not already exist in the address book.
      */
-    void addClassSpace(Group group);
+    void addGroup(Group group);
 
     /**
-     * Deletes the given class space.
-     * The class space must exist in the address book.
+     * Deletes the given group.
+     * The group must exist in the address book.
      */
-    void deleteClassSpace(Group target);
+    void deleteGroup(Group target);
 
     /**
-     * Replaces the given class space {@code target} with {@code editedGroup}.
+     * Replaces the given group {@code target} with {@code editedGroup}.
      */
-    void setClassSpace(Group target, Group editedGroup);
+    void setGroup(Group target, Group editedGroup);
 
-    /** Returns an unmodifiable view of the class space list. */
-    ObservableList<Group> getClassSpaceList();
+    /** Returns an unmodifiable view of the group list. */
+    ObservableList<Group> getGroupList();
 
     /** Returns an unmodifiable view of the filtered person list */
     ObservableList<Person> getFilteredPersonList();
@@ -132,13 +132,13 @@ public interface Model {
     /** Switches the current view to all students and shows all students. */
     void switchToAllStudentsView();
 
-    /** Switches the current view to the given class space and shows all students in that class space. */
-    void switchToClassSpaceView(ClassSpaceName classSpaceName);
+    /** Switches the current view to the given group and shows all students in that group. */
+    void switchToGroupView(GroupName groupName);
 
     /**
-     * Returns the current active class space, or empty if the current view is all students.
+     * Returns the current active group, or empty if the current view is all students.
      */
-    Optional<ClassSpaceName> getActiveClassSpaceName();
+    Optional<GroupName> getActiveGroupName();
 
     /**
      * Returns the current active session date, or empty if no session is selected.
@@ -158,8 +158,8 @@ public interface Model {
     /** Returns the current view label property. */
     ReadOnlyStringProperty currentViewProperty();
 
-    /** Returns the current active class space property. */
-    ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty();
+    /** Returns the current active group property. */
+    ReadOnlyObjectProperty<GroupName> activeGroupNameProperty();
 
     /** Returns the current active session date property. */
     ReadOnlyObjectProperty<LocalDate> activeSessionDateProperty();

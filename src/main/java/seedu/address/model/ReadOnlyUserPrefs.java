@@ -15,9 +15,9 @@ public interface ReadOnlyUserPrefs {
     Path getAddressBookFilePath();
 
     /**
-     * Returns the last active class space name from a previous session, if any.
+     * Returns the last active group name from a previous session, if any.
      */
-    Optional<String> getLastActiveClassSpaceName();
+    Optional<String> getLastActiveGroupName();
 
     /**
      * Returns the last active session date (yyyy-MM-dd) from a previous session, if any.

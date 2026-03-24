@@ -13,7 +13,7 @@ import java.util.Optional;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
@@ -33,8 +33,8 @@ public class ExportViewCommand extends Command {
             + "Example: " + COMMAND_WORD + " f/exports/t01-view.csv";
 
     public static final String MESSAGE_SUCCESS = "Exported view to %1$s";
-    public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
-            "No class space selected. Switch to a class space before exporting the view.";
+    public static final String MESSAGE_NO_ACTIVE_GROUP =
+            "No group selected. Switch to a group before exporting the view.";
     public static final String MESSAGE_EXPORT_FAILED = "Could not export view: %1$s";
 
     private final String filePath;
@@ -54,10 +54,10 @@ public class ExportViewCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        ClassSpaceName activeClassSpace = model.getActiveClassSpaceName()
-                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_CLASS_SPACE));
+        GroupName activeGroup = model.getActiveGroupName()
+                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
         List<Person> persons = List.copyOf(model.getFilteredPersonList());
-        List<LocalDate> sessionDates = getSessionDates(persons, activeClassSpace, model);
+        List<LocalDate> sessionDates = getSessionDates(persons, activeGroup, model);
 
         StringBuilder csv = new StringBuilder("Student");
         for (LocalDate sessionDate : sessionDates) {
@@ -69,9 +69,9 @@ public class ExportViewCommand extends Command {
         for (Person person : persons) {
             csv.append(escape(person.getName().fullName));
             for (LocalDate sessionDate : sessionDates) {
-                Attendance attendance = person.getAttendance(activeClassSpace, sessionDate);
+                Attendance attendance = person.getAttendance(activeGroup, sessionDate);
                 csv.append(',').append(attendance.value);
-                csv.append(',').append(person.getParticipation(activeClassSpace, sessionDate));
+                csv.append(',').append(person.getParticipation(activeGroup, sessionDate));
             }
             csv.append(System.lineSeparator());
         }
@@ -89,13 +89,13 @@ public class ExportViewCommand extends Command {
         return new CommandResult(String.format(MESSAGE_SUCCESS, outputPath.toAbsolutePath()));
     }
 
-    private List<LocalDate> getSessionDates(List<Person> persons, ClassSpaceName classSpaceName, Model model) {
+    private List<LocalDate> getSessionDates(List<Person> persons, GroupName groupName, Model model) {
         Optional<LocalDate> rangeStart = model.getVisibleSessionRangeStart();
         Optional<LocalDate> rangeEnd = model.getVisibleSessionRangeEnd();
         return persons.stream()
-                .filter(person -> person.hasClassSpace(classSpaceName))
-                .flatMap(person -> person.getClassSpaceSessions()
-                        .getOrDefault(classSpaceName, new SessionList())
+                .filter(person -> person.hasGroup(groupName))
+                .flatMap(person -> person.getGroupSessions()
+                        .getOrDefault(groupName, new SessionList())
                         .getSessions()
                         .stream())
                 .map(Session::getDate)

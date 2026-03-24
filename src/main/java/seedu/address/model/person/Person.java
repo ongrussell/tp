@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -31,14 +31,14 @@ public class Person {
 
     // Data fields
     private final Set<Tag> tags = new HashSet<>();
-    private final Set<ClassSpaceName> classSpaces = new HashSet<>();
+    private final Set<GroupName> groups = new HashSet<>();
 
     // Session fields (to be refactored into Session class)
     private final Attendance attendance;
     private final Participation participation;
 
-    private final Map<ClassSpaceName, SessionList> classSpaceSessions = new HashMap<>();
-    private final Map<ClassSpaceName, Map<AssignmentName, Integer>> assignmentGrades = new HashMap<>();
+    private final Map<GroupName, SessionList> groupSessions = new HashMap<>();
+    private final Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades = new HashMap<>();
 
     /**
      * Used for AddCommand. Every field must be present and not null.
@@ -53,9 +53,9 @@ public class Person {
     /**
      * Used for AddCommand. Every field must be present and not null.
      */
-    public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<ClassSpaceName> classSpaces,
+    public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<GroupName> groups,
                   Set<Tag> tags) {
-        this(name, phone, email, matricNumber, tags, classSpaces,
+        this(name, phone, email, matricNumber, tags, groups,
                 new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), new HashMap<>(),
                 new HashMap<>()
         );
@@ -66,7 +66,7 @@ public class Person {
      */
     public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
         this(name, phone, email, matricNumber, tags,
-                person.classSpaces, person.attendance, person.participation, person.classSpaceSessions,
+                person.groups, person.attendance, person.participation, person.groupSessions,
                 person.assignmentGrades);
     }
 
@@ -74,43 +74,43 @@ public class Person {
      * Used for Attendance commands. Every field must be present and not null.
      */
     public Person(Person person, Attendance attendance) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.classSpaces,
-                attendance, person.participation, person.classSpaceSessions, person.assignmentGrades);
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
+                attendance, person.participation, person.groupSessions, person.assignmentGrades);
     }
 
     /**
      * Used for Participation commands. Every field must be present and not null.
      */
     public Person(Person person, Participation participation) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.classSpaces,
-                person.attendance, participation, person.classSpaceSessions, person.assignmentGrades
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
+                person.attendance, participation, person.groupSessions, person.assignmentGrades
         );
     }
 
     /**
      * Used for Group commands. Every field must be present and not null.
      */
-    public Person(Person person, Set<ClassSpaceName> classSpaces) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, classSpaces,
-                person.attendance, person.participation, person.classSpaceSessions, person.assignmentGrades
+    public Person(Person person, Set<GroupName> groups) {
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, groups,
+                person.attendance, person.participation, person.groupSessions, person.assignmentGrades
         );
     }
 
     /**
      * Used for Session commands. Every field must be present and not null.
      */
-    public Person(Person person, Map<ClassSpaceName, SessionList> updatedSessionMap) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.classSpaces,
+    public Person(Person person, Map<GroupName, SessionList> updatedSessionMap) {
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
                 person.attendance, person.participation, updatedSessionMap, person.assignmentGrades);
     }
 
     /**
      * Used for assignment-grade updates. Every field must be present and not null.
      */
-    public Person(Person person, Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades,
+    public Person(Person person, Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades,
                   boolean ignored) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.classSpaces,
-                person.attendance, person.participation, person.classSpaceSessions, updatedAssignmentGrades);
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
+                person.attendance, person.participation, person.groupSessions, updatedAssignmentGrades);
     }
 
     private Person(Name name,
@@ -118,22 +118,22 @@ public class Person {
                    Email email,
                    MatricNumber matricNumber,
                    Set<Tag> tags,
-                   Set<ClassSpaceName> classSpaces,
+                   Set<GroupName> groups,
                    Attendance attendance,
                    Participation participation,
-                   Map<ClassSpaceName, SessionList> classSpaceSessions,
-                   Map<ClassSpaceName, Map<AssignmentName, Integer>> assignmentGrades) {
-        requireAllNonNull(name, phone, email, matricNumber, attendance, participation, tags, classSpaces,
-                classSpaceSessions, assignmentGrades);
+                   Map<GroupName, SessionList> groupSessions,
+                   Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades) {
+        requireAllNonNull(name, phone, email, matricNumber, attendance, participation, tags, groups,
+                groupSessions, assignmentGrades);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.matricNumber = matricNumber;
         this.tags.addAll(tags);
-        this.classSpaces.addAll(classSpaces);
+        this.groups.addAll(groups);
         this.attendance = attendance;
         this.participation = participation;
-        this.classSpaceSessions.putAll(copySessionMap(classSpaceSessions));
+        this.groupSessions.putAll(copySessionMap(groupSessions));
         this.assignmentGrades.putAll(copyAssignmentGradeMap(assignmentGrades));
     }
 
@@ -141,31 +141,31 @@ public class Person {
      * Returns a copy of the {@code Person} with the specified {@code Session} added or overwritten.
      * Preserves immutability of {@code Person}.
      *
-     * @param classSpaceName Class Space of the person.
+     * @param groupName Group of the person.
      * @param newSession Session to be updated or added.
      * @return {@code Person} object with updated {@code Session} information.
      */
-    public Person withUpdatedSession(ClassSpaceName classSpaceName, Session newSession) {
-        Map<ClassSpaceName, SessionList> updatedSessionMap = copySessionMap(this.classSpaceSessions);
-        SessionList currentSessionList = updatedSessionMap.getOrDefault(classSpaceName, new SessionList());
+    public Person withUpdatedSession(GroupName groupName, Session newSession) {
+        Map<GroupName, SessionList> updatedSessionMap = copySessionMap(this.groupSessions);
+        SessionList currentSessionList = updatedSessionMap.getOrDefault(groupName, new SessionList());
 
         // Create a copy of the SessionList and add or overwrite the session.
         SessionList newSessionList = new SessionList(currentSessionList.getSessions());
         newSessionList.addSession(newSession);
 
         // Update the map.
-        updatedSessionMap.put(classSpaceName, newSessionList);
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.classSpaces,
+        updatedSessionMap.put(groupName, newSessionList);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
                 this.attendance, this.participation, updatedSessionMap, this.assignmentGrades);
     }
 
     /**
-     * Returns a copy of the {@code Person} with the specified session removed from the class space.
+     * Returns a copy of the {@code Person} with the specified session removed from the group.
      */
-    public Person withoutSession(ClassSpaceName classSpaceName, LocalDate date) {
-        requireAllNonNull(classSpaceName, date);
-        Map<ClassSpaceName, SessionList> updatedSessionMap = copySessionMap(this.classSpaceSessions);
-        SessionList currentSessionList = updatedSessionMap.get(classSpaceName);
+    public Person withoutSession(GroupName groupName, LocalDate date) {
+        requireAllNonNull(groupName, date);
+        Map<GroupName, SessionList> updatedSessionMap = copySessionMap(this.groupSessions);
+        SessionList currentSessionList = updatedSessionMap.get(groupName);
         if (currentSessionList == null) {
             return this;
         }
@@ -177,157 +177,157 @@ public class Person {
         }
 
         if (newSessionList.getSessions().isEmpty()) {
-            updatedSessionMap.remove(classSpaceName);
+            updatedSessionMap.remove(groupName);
         } else {
-            updatedSessionMap.put(classSpaceName, newSessionList);
+            updatedSessionMap.put(groupName, newSessionList);
         }
 
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.classSpaces,
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
                 this.attendance, this.participation, updatedSessionMap, this.assignmentGrades);
     }
 
     /**
      * Returns a copy of the {@code Person} with the given assignment grade added or overwritten.
      */
-    public Person withUpdatedAssignmentGrade(ClassSpaceName classSpaceName, AssignmentName assignmentName, int grade) {
-        requireAllNonNull(classSpaceName, assignmentName);
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
+    public Person withUpdatedAssignmentGrade(GroupName groupName, AssignmentName assignmentName, int grade) {
+        requireAllNonNull(groupName, assignmentName);
+        Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
                 copyAssignmentGradeMap(this.assignmentGrades);
         Map<AssignmentName, Integer> classAssignmentGrades =
-                updatedAssignmentGrades.getOrDefault(classSpaceName, new HashMap<>());
+                updatedAssignmentGrades.getOrDefault(groupName, new HashMap<>());
         classAssignmentGrades.put(assignmentName, grade);
-        updatedAssignmentGrades.put(classSpaceName, classAssignmentGrades);
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.classSpaces,
-                this.attendance, this.participation, this.classSpaceSessions, updatedAssignmentGrades);
+        updatedAssignmentGrades.put(groupName, classAssignmentGrades);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
+                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
     }
 
     /**
-     * Returns a copy of the {@code Person} with all data for the specified class space removed.
+     * Returns a copy of the {@code Person} with all data for the specified group removed.
      */
-    public Person withoutClassSpaceData(ClassSpaceName classSpaceName) {
-        requireAllNonNull(classSpaceName);
-        Set<ClassSpaceName> updatedClassSpaces = new HashSet<>(this.classSpaces);
-        updatedClassSpaces.remove(classSpaceName);
+    public Person withoutGroupData(GroupName groupName) {
+        requireAllNonNull(groupName);
+        Set<GroupName> updatedGroups = new HashSet<>(this.groups);
+        updatedGroups.remove(groupName);
 
-        Map<ClassSpaceName, SessionList> updatedSessionMap = copySessionMap(this.classSpaceSessions);
-        updatedSessionMap.remove(classSpaceName);
+        Map<GroupName, SessionList> updatedSessionMap = copySessionMap(this.groupSessions);
+        updatedSessionMap.remove(groupName);
 
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
+        Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
                 copyAssignmentGradeMap(this.assignmentGrades);
-        updatedAssignmentGrades.remove(classSpaceName);
+        updatedAssignmentGrades.remove(groupName);
 
         // consider converting this to Wither Pattern
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedClassSpaces,
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedGroups,
                 this.attendance, this.participation, updatedSessionMap, updatedAssignmentGrades);
 
     }
 
     /**
-     * Returns a copy of the {@code Person} with the class space renamed across all relevant data.
+     * Returns a copy of the {@code Person} with the group renamed across all relevant data.
      */
-    public Person withRenamedClassSpace(ClassSpaceName oldClassSpaceName, ClassSpaceName newClassSpaceName) {
-        requireAllNonNull(oldClassSpaceName, newClassSpaceName);
+    public Person withRenamedGroup(GroupName oldGroupName, GroupName newGroupName) {
+        requireAllNonNull(oldGroupName, newGroupName);
 
-        Set<ClassSpaceName> updatedClassSpaces = new HashSet<>(this.classSpaces);
-        if (updatedClassSpaces.remove(oldClassSpaceName)) {
-            updatedClassSpaces.add(newClassSpaceName);
+        Set<GroupName> updatedGroups = new HashSet<>(this.groups);
+        if (updatedGroups.remove(oldGroupName)) {
+            updatedGroups.add(newGroupName);
         }
 
-        Map<ClassSpaceName, SessionList> updatedSessionMap = copySessionMap(this.classSpaceSessions);
-        SessionList existingSessions = updatedSessionMap.remove(oldClassSpaceName);
+        Map<GroupName, SessionList> updatedSessionMap = copySessionMap(this.groupSessions);
+        SessionList existingSessions = updatedSessionMap.remove(oldGroupName);
         if (existingSessions != null) {
-            updatedSessionMap.put(newClassSpaceName, existingSessions);
+            updatedSessionMap.put(newGroupName, existingSessions);
         }
 
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
+        Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
                 copyAssignmentGradeMap(this.assignmentGrades);
-        Map<AssignmentName, Integer> existingGrades = updatedAssignmentGrades.remove(oldClassSpaceName);
+        Map<AssignmentName, Integer> existingGrades = updatedAssignmentGrades.remove(oldGroupName);
         if (existingGrades != null) {
-            updatedAssignmentGrades.put(newClassSpaceName, existingGrades);
+            updatedAssignmentGrades.put(newGroupName, existingGrades);
         }
 
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedClassSpaces,
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedGroups,
                 this.attendance, this.participation, updatedSessionMap, updatedAssignmentGrades);
     }
 
     /**
      * Returns a copy of the {@code Person} with the specified assignment grade removed.
      */
-    public Person withoutAssignmentGrade(ClassSpaceName classSpaceName, AssignmentName assignmentName) {
-        requireAllNonNull(classSpaceName, assignmentName);
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
+    public Person withoutAssignmentGrade(GroupName groupName, AssignmentName assignmentName) {
+        requireAllNonNull(groupName, assignmentName);
+        Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
                 copyAssignmentGradeMap(this.assignmentGrades);
-        Map<AssignmentName, Integer> classAssignmentGrades = updatedAssignmentGrades.get(classSpaceName);
+        Map<AssignmentName, Integer> classAssignmentGrades = updatedAssignmentGrades.get(groupName);
         if (classAssignmentGrades == null) {
             return this;
         }
         classAssignmentGrades.remove(assignmentName);
         if (classAssignmentGrades.isEmpty()) {
-            updatedAssignmentGrades.remove(classSpaceName);
+            updatedAssignmentGrades.remove(groupName);
         } else {
-            updatedAssignmentGrades.put(classSpaceName, classAssignmentGrades);
+            updatedAssignmentGrades.put(groupName, classAssignmentGrades);
         }
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.classSpaces,
-                this.attendance, this.participation, this.classSpaceSessions, updatedAssignmentGrades);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
+                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
     }
 
     /**
      * Returns a copy of the {@code Person} with the specified assignment grade key renamed.
      */
-    public Person withRenamedAssignmentGrade(ClassSpaceName classSpaceName, AssignmentName oldAssignmentName,
+    public Person withRenamedAssignmentGrade(GroupName groupName, AssignmentName oldAssignmentName,
                                              AssignmentName newAssignmentName) {
-        requireAllNonNull(classSpaceName, oldAssignmentName, newAssignmentName);
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
+        requireAllNonNull(groupName, oldAssignmentName, newAssignmentName);
+        Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades =
                 copyAssignmentGradeMap(this.assignmentGrades);
-        Map<AssignmentName, Integer> classAssignmentGrades = updatedAssignmentGrades.get(classSpaceName);
+        Map<AssignmentName, Integer> classAssignmentGrades = updatedAssignmentGrades.get(groupName);
         if (classAssignmentGrades == null || !classAssignmentGrades.containsKey(oldAssignmentName)) {
             return this;
         }
         Integer existingGrade = classAssignmentGrades.remove(oldAssignmentName);
         classAssignmentGrades.put(newAssignmentName, existingGrade);
-        updatedAssignmentGrades.put(classSpaceName, classAssignmentGrades);
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.classSpaces,
-                this.attendance, this.participation, this.classSpaceSessions, updatedAssignmentGrades);
+        updatedAssignmentGrades.put(groupName, classAssignmentGrades);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
+                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
     }
 
     /**
-     * Returns a {@code Map<ClassSpaceName, SessionList>}.
-     * Represents the sessions for a class space.
+     * Returns a {@code Map<GroupName, SessionList>}.
+     * Represents the sessions for a group.
      *
-     * @return {@code Map<ClassSpaceName, SessionList>}.
+     * @return {@code Map<GroupName, SessionList>}.
      */
-    public Map<ClassSpaceName, SessionList> getClassSpaceSessions() {
-        return Collections.unmodifiableMap(classSpaceSessions);
+    public Map<GroupName, SessionList> getGroupSessions() {
+        return Collections.unmodifiableMap(groupSessions);
     }
 
     /**
      * Returns the assignment grade map.
      */
-    public Map<ClassSpaceName, Map<AssignmentName, Integer>> getAssignmentGrades() {
+    public Map<GroupName, Map<AssignmentName, Integer>> getAssignmentGrades() {
         return assignmentGrades.entrySet().stream()
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
                         entry -> Collections.unmodifiableMap(entry.getValue())));
     }
 
     /**
-     * Returns the grade for the specified assignment in the given class space, if it exists.
+     * Returns the grade for the specified assignment in the given group, if it exists.
      */
-    public Optional<Integer> getAssignmentGrade(ClassSpaceName classSpaceName, AssignmentName assignmentName) {
-        requireAllNonNull(classSpaceName, assignmentName);
-        return Optional.ofNullable(assignmentGrades.getOrDefault(classSpaceName, Collections.emptyMap())
+    public Optional<Integer> getAssignmentGrade(GroupName groupName, AssignmentName assignmentName) {
+        requireAllNonNull(groupName, assignmentName);
+        return Optional.ofNullable(assignmentGrades.getOrDefault(groupName, Collections.emptyMap())
                 .get(assignmentName));
     }
 
     /**
-     * Returns the session that belongs to a class space for a given date.
+     * Returns the session that belongs to a group for a given date.
      * Creates the session if it does not exist yet.
      *
-     * @param classSpaceName Class space name.
+     * @param groupName Group name.
      * @param date Date of session.
-     * @return Session belonging to the class space for a given date.
+     * @return Session belonging to the group for a given date.
      */
-    public Session getOrCreateSession(ClassSpaceName classSpaceName, LocalDate date) {
-        return classSpaceSessions.getOrDefault(classSpaceName, new SessionList())
+    public Session getOrCreateSession(GroupName groupName, LocalDate date) {
+        return groupSessions.getOrDefault(groupName, new SessionList())
                 .getSession(date)
                 .orElseGet(() -> new Session(date,
                         new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), ""));
@@ -350,16 +350,16 @@ public class Person {
     }
 
     /**
-     * Returns the attendance for the specified class space and session date.
+     * Returns the attendance for the specified group and session date.
      * If the session does not exist, returns UNINITIALISED attendance.
      *
-     * @param classSpaceName Class space name.
+     * @param groupName Group name.
      * @param date Date of session.
      * @return Attendance for the specified session.
      */
-    public Attendance getAttendance(ClassSpaceName classSpaceName, LocalDate date) {
-        requireAllNonNull(classSpaceName, date);
-        return getOrCreateSession(classSpaceName, date).getAttendance();
+    public Attendance getAttendance(GroupName groupName, LocalDate date) {
+        requireAllNonNull(groupName, date);
+        return getOrCreateSession(groupName, date).getAttendance();
     }
 
     // TODO: Remove. This is legacy from pre-Session class.
@@ -368,16 +368,16 @@ public class Person {
     }
 
     /**
-     * Returns the participation for the specified class space and session date.
+     * Returns the participation for the specified group and session date.
      * If the session does not exist, returns 0 participation.
      *
-     * @param classSpaceName Class space name.
+     * @param groupName Group name.
      * @param date Date of session.
      * @return Participation for the specified session.
      */
-    public Participation getParticipation(ClassSpaceName classSpaceName, LocalDate date) {
-        requireAllNonNull(classSpaceName, date);
-        return getOrCreateSession(classSpaceName, date).getParticipation();
+    public Participation getParticipation(GroupName groupName, LocalDate date) {
+        requireAllNonNull(groupName, date);
+        return getOrCreateSession(groupName, date).getParticipation();
     }
 
     // TODO: Remove. This is legacy from pre-Session class.
@@ -386,12 +386,12 @@ public class Person {
     }
 
     /**
-     * Returns the note for the specified class space and session date.
+     * Returns the note for the specified group and session date.
      * If the session does not exist, returns an empty note.
      */
-    public String getSessionNote(ClassSpaceName classSpaceName, LocalDate date) {
-        requireAllNonNull(classSpaceName, date);
-        return getOrCreateSession(classSpaceName, date).getNote();
+    public String getSessionNote(GroupName groupName, LocalDate date) {
+        requireAllNonNull(groupName, date);
+        return getOrCreateSession(groupName, date).getNote();
     }
 
     /**
@@ -403,18 +403,18 @@ public class Person {
     }
 
     /**
-     * Returns an immutable class space set, which throws {@code UnsupportedOperationException}
+     * Returns an immutable group set, which throws {@code UnsupportedOperationException}
      * if modification is attempted.
      */
-    public Set<ClassSpaceName> getClassSpaces() {
-        return Collections.unmodifiableSet(classSpaces);
+    public Set<GroupName> getGroups() {
+        return Collections.unmodifiableSet(groups);
     }
 
     /**
-     * Returns true if the person belongs to the specified class space.
+     * Returns true if the person belongs to the specified group.
      */
-    public boolean hasClassSpace(ClassSpaceName classSpaceName) {
-        return classSpaces.contains(classSpaceName);
+    public boolean hasGroup(GroupName groupName) {
+        return groups.contains(groupName);
     }
 
     /**
@@ -452,8 +452,8 @@ public class Person {
                 && attendance.equals(otherPerson.attendance) // TODO: Remove. This is legacy from pre-Session class.
                 && participation.equals(otherPerson.participation) // TODO: Remove. This is legacy pre-Session class.
                 && tags.equals(otherPerson.tags)
-                && classSpaces.equals(otherPerson.classSpaces)
-                && classSpaceSessions.equals(otherPerson.classSpaceSessions)
+                && groups.equals(otherPerson.groups)
+                && groupSessions.equals(otherPerson.groupSessions)
                 && assignmentGrades.equals(otherPerson.assignmentGrades);
     }
 
@@ -462,7 +462,7 @@ public class Person {
         // use this method for custom fields hashing instead of implementing your own
         return Objects.hash(name, phone, email, matricNumber,
                 attendance, participation, // TODO: Remove. This is legacy from pre-Session class.
-                tags, classSpaces, classSpaceSessions, assignmentGrades);
+                tags, groups, groupSessions, assignmentGrades);
     }
 
     @Override
@@ -474,22 +474,22 @@ public class Person {
                 .add("matricNumber", matricNumber)
                 //.add("participation", participation) // TODO: Remove after Participation is removed from Person
                 .add("tags", tags)
-                .add("groups", classSpaces)
+                .add("groups", groups)
                 .toString();
     }
 
-    private static Map<ClassSpaceName, SessionList> copySessionMap(Map<ClassSpaceName, SessionList> source) {
-        Map<ClassSpaceName, SessionList> copiedMap = new HashMap<>();
-        source.forEach((classSpaceName, sessionList) ->
-                copiedMap.put(classSpaceName, new SessionList(sessionList.getSessions())));
+    private static Map<GroupName, SessionList> copySessionMap(Map<GroupName, SessionList> source) {
+        Map<GroupName, SessionList> copiedMap = new HashMap<>();
+        source.forEach((groupName, sessionList) ->
+                copiedMap.put(groupName, new SessionList(sessionList.getSessions())));
         return copiedMap;
     }
 
-    private static Map<ClassSpaceName, Map<AssignmentName, Integer>> copyAssignmentGradeMap(
-            Map<ClassSpaceName, Map<AssignmentName, Integer>> source) {
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> copiedMap = new HashMap<>();
-        source.forEach((classSpaceName, assignmentGradeMap) ->
-                copiedMap.put(classSpaceName, new HashMap<>(assignmentGradeMap)));
+    private static Map<GroupName, Map<AssignmentName, Integer>> copyAssignmentGradeMap(
+            Map<GroupName, Map<AssignmentName, Integer>> source) {
+        Map<GroupName, Map<AssignmentName, Integer>> copiedMap = new HashMap<>();
+        source.forEach((groupName, assignmentGradeMap) ->
+                copiedMap.put(groupName, new HashMap<>(assignmentGradeMap)));
         return copiedMap;
     }
 }

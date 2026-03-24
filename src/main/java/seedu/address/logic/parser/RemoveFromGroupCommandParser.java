@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.RemoveFromGroupCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 
 /**
@@ -29,7 +29,7 @@ public class RemoveFromGroupCommandParser implements Parser<RemoveFromGroupComma
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_GROUP, PREFIX_INDEXES);
-        ClassSpaceName classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
+        GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
         boolean hasMatricTargets = !argMultimap.getAllValues(PREFIX_MATRIC_NUMBER).isEmpty();
         boolean hasIndexTargets = argMultimap.getValue(PREFIX_INDEXES).isPresent();
 
@@ -40,11 +40,11 @@ public class RemoveFromGroupCommandParser implements Parser<RemoveFromGroupComma
 
         if (hasIndexTargets) {
             List<Index> indexes = ParserUtil.parseIndexes(argMultimap.getValue(PREFIX_INDEXES).get());
-            return RemoveFromGroupCommand.forIndexes(classSpaceName, indexes);
+            return RemoveFromGroupCommand.forIndexes(groupName, indexes);
         }
 
         List<MatricNumber> matricNumbers = convertMatricNumbers(argMultimap);
-        return RemoveFromGroupCommand.forMatricNumbers(classSpaceName, matricNumbers);
+        return RemoveFromGroupCommand.forMatricNumbers(groupName, matricNumbers);
     }
 
     private static List<MatricNumber> convertMatricNumbers(ArgumentMultimap argMultimap) throws ParseException {

@@ -12,7 +12,7 @@ import java.util.Optional;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.PartCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Participation;
 
 /**
@@ -44,17 +44,17 @@ public class PartCommandParser implements Parser<PartCommand> {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
             }
 
-            Optional<ClassSpaceName> classSpaceName = Optional.empty();
+            Optional<GroupName> groupName = Optional.empty();
             if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-                classSpaceName = Optional.of(
-                        ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get())
+                groupName = Optional.of(
+                        ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get())
                 );
             }
 
             Participation participation =
                     new Participation(argMultimap.getValue(PREFIX_PARTICIPATION).get());
 
-            return new PartCommand(index, date, classSpaceName, participation);
+            return new PartCommand(index, date, groupName, participation);
         } catch (IllegalArgumentException | ParseException e) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE), e);
         }

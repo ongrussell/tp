@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -28,38 +29,38 @@ public class JsonSerializableAddressBookTest {
     private static final Path DUPLICATE_PERSON_FILE = TEST_DATA_FOLDER.resolve("duplicatePersonAddressBook.json");
     private static final Path PERSON_WITH_MULTIPLE_INVALID_FIELDS =
             TEST_DATA_FOLDER.resolve("invalidPersonAddressBookWithMultipleInvalidFields.json");
-    private static final Path IMPLICIT_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("personWithImplicitClassSpaceAddressBook.json");
+    private static final Path IMPLICIT_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("personWithImplicitGroupAddressBook.json");
     private static final Path MISSING_NAME_PERSON_FILE =
             TEST_DATA_FOLDER.resolve("missingNamePersonAddressBook.json");
     private static final Path JSON_NULL_NAME_PERSON_FILE =
             TEST_DATA_FOLDER.resolve("jsonNullNamePersonAddressBook.json");
-    private static final Path DUPLICATE_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("duplicateClassSpaceAddressBook.json");
-    private static final Path INVALID_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("invalidClassSpaceAddressBook.json");
+    private static final Path DUPLICATE_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("duplicateGroupAddressBook.json");
+    private static final Path INVALID_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("invalidGroupAddressBook.json");
     private static final Path GRADE_EXCEEDS_MAX_MARKS_FILE =
             TEST_DATA_FOLDER.resolve("gradeExceedsMaxMarksAddressBook.json");
     private static final Path GRADE_AT_MAX_MARKS_FILE =
             TEST_DATA_FOLDER.resolve("gradeAtMaxMarksAddressBook.json");
     private static final Path NEGATIVE_MAX_MARKS_FILE =
             TEST_DATA_FOLDER.resolve("negativeMaxMarksAddressBook.json");
-    private static final Path GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("gradeForNonMemberClassSpaceAddressBook.json");
+    private static final Path GRADE_FOR_NON_MEMBER_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("gradeForNonMemberGroupAddressBook.json");
     private static final Path GRADE_FOR_NON_EXISTENT_ASSIGNMENT_FILE =
             TEST_DATA_FOLDER.resolve("gradeForNonExistentAssignmentAddressBook.json");
-    private static final Path SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("sessionForNonMemberClassSpaceAddressBook.json");
+    private static final Path SESSION_FOR_NON_MEMBER_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("sessionForNonMemberGroupAddressBook.json");
     private static final Path VALID_GRADES_AND_SESSIONS_FILE =
             TEST_DATA_FOLDER.resolve("validGradesAndSessionsAddressBook.json");
     private static final Path PRESERVED_SKIPPED_PERSONS_FILE =
             TEST_DATA_FOLDER.resolve("preservedSkippedPersonsAddressBook.json");
-    private static final Path PRESERVED_SKIPPED_CLASS_SPACES_FILE =
-            TEST_DATA_FOLDER.resolve("preservedSkippedClassSpacesAddressBook.json");
+    private static final Path PRESERVED_SKIPPED_GROUPS_FILE =
+            TEST_DATA_FOLDER.resolve("preservedSkippedGroupsAddressBook.json");
     private static final Path INVALID_ASSIGNMENT_NAME_FILE =
             TEST_DATA_FOLDER.resolve("invalidAssignmentNameAddressBook.json");
-    private static final Path MISSING_NAME_CLASS_SPACE_FILE =
-            TEST_DATA_FOLDER.resolve("missingNameClassSpaceAddressBook.json");
+    private static final Path MISSING_NAME_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("missingNameGroupAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -148,8 +149,8 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_personWithImplicitClassSpace_createsClassSpaceAutomatically() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(IMPLICIT_CLASS_SPACE_FILE,
+    public void toModelType_personWithImplicitGroup_createsGroupAutomatically() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(IMPLICIT_GROUP_FILE,
                 JsonSerializableAddressBook.class).get();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
@@ -157,15 +158,15 @@ public class JsonSerializableAddressBookTest {
         // Verify the person was loaded successfully.
         assertEquals(1, addressBookFromFile.getPersonList().size());
 
-        // Verify that the app automatically created the missing class space.
-        assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        // Verify that the app automatically created the missing group.
+        assertEquals(1, addressBookFromFile.getGroupList().size());
 
-        // Verify that it is the expected class space.
+        // Verify that it is the expected group.
         Group expectedGroup =
                 new Group(
-                        new seedu.address.model.classspace.ClassSpaceName("Implicit-Class-Space"));
+                        new GroupName("Implicit-Class-Space"));
 
-        assertTrue(addressBookFromFile.hasClassSpace(expectedGroup));
+        assertTrue(addressBookFromFile.hasGroup(expectedGroup));
     }
 
     @Test
@@ -192,15 +193,15 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_duplicateClassSpaces_skipsDuplicateClassSpaceAndAddsWarning() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(DUPLICATE_CLASS_SPACE_FILE,
+    public void toModelType_duplicateGroups_skipsDuplicateGroupAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(DUPLICATE_GROUP_FILE,
                 JsonSerializableAddressBook.class).get();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
-        assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, addressBookFromFile.getGroupList().size());
         assertEquals(1, dataFromFile.getLoadWarnings().size());
-        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped duplicate class space"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped duplicate group"));
     }
 
     @Test
@@ -210,19 +211,19 @@ public class JsonSerializableAddressBookTest {
 
         AddressBook addressBook = serializable.toModelType();
         assertEquals(0, addressBook.getPersonList().size());
-        assertEquals(0, addressBook.getClassSpaceList().size());
+        assertEquals(0, addressBook.getGroupList().size());
     }
 
     @Test
-    public void toModelType_invalidClassSpaceAddressBook_skipsInvalidClassSpaceAndAddsWarning() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(INVALID_CLASS_SPACE_FILE,
+    public void toModelType_invalidGroupAddressBook_skipsInvalidGroupAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(INVALID_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
-        assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, addressBookFromFile.getGroupList().size());
         assertEquals(1, dataFromFile.getLoadWarnings().size());
-        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid group"));
     }
 
     @Test
@@ -241,7 +242,7 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_gradeExceedsMaxMarks_warningIncludesAssignmentAndClassSpaceDetails() throws Exception {
+    public void toModelType_gradeExceedsMaxMarks_warningIncludesAssignmentAndGroupDetails() throws Exception {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_EXCEEDS_MAX_MARKS_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
@@ -249,7 +250,7 @@ public class JsonSerializableAddressBookTest {
 
         String warning = dataFromFile.getLoadWarnings().get(0);
         assertTrue(warning.contains("Quiz 1"), "Warning should mention the assignment name");
-        assertTrue(warning.contains("T01"), "Warning should mention the class space name");
+        assertTrue(warning.contains("T01"), "Warning should mention the group name");
         assertTrue(warning.contains("105"), "Warning should mention the offending grade");
         assertTrue(warning.contains("100"), "Warning should mention the max marks");
     }
@@ -267,21 +268,21 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_negativeMaxMarksAssignment_skipsClassSpaceAndAddsWarning() throws Exception {
+    public void toModelType_negativeMaxMarksAssignment_skipsGroupAndAddsWarning() throws Exception {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(NEGATIVE_MAX_MARKS_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
-        assertEquals(0, addressBookFromFile.getClassSpaceList().size());
-        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
+        assertEquals(0, addressBookFromFile.getGroupList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedGroups().size());
         assertEquals(1, dataFromFile.getLoadWarnings().size());
-        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid group"));
     }
 
     @Test
-    public void toModelType_gradeForNonMemberClassSpace_skipsPersonAndAddsWarning() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+    public void toModelType_gradeForNonMemberGroup_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
@@ -294,8 +295,8 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_gradeForNonMemberClassSpace_warningMentionsClassSpace() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+    public void toModelType_gradeForNonMemberGroup_warningMentionsGroup() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_MEMBER_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         dataFromFile.toModelType();
@@ -318,7 +319,7 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_gradeForNonExistentAssignment_warningMentionsAssignmentAndClassSpace() throws Exception {
+    public void toModelType_gradeForNonExistentAssignment_warningMentionsAssignmentAndGroup() throws Exception {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(GRADE_FOR_NON_EXISTENT_ASSIGNMENT_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
@@ -330,8 +331,8 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_sessionForNonMemberClassSpace_skipsPersonAndAddsWarning() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+    public void toModelType_sessionForNonMemberGroup_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
@@ -344,8 +345,8 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_sessionForNonMemberClassSpace_warningMentionsClassSpace() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_CLASS_SPACE_FILE,
+    public void toModelType_sessionForNonMemberGroup_warningMentionsGroup() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(SESSION_FOR_NON_MEMBER_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         dataFromFile.toModelType();
@@ -403,29 +404,29 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_preservedSkippedClassSpacesInFile_survivesReload() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_CLASS_SPACES_FILE,
+    public void toModelType_preservedSkippedGroupsInFile_survivesReload() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_GROUPS_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         dataFromFile.toModelType();
 
-        // The skipped class space from the file should still be preserved after toModelType().
-        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
+        // The skipped group from the file should still be preserved after toModelType().
+        assertEquals(1, dataFromFile.getPreservedSkippedGroups().size());
         assertEquals("T01!!!",
-                dataFromFile.getPreservedSkippedClassSpaces().get(0).get("name").asText());
+                dataFromFile.getPreservedSkippedGroups().get(0).get("name").asText());
     }
 
     @Test
-    public void toModelType_preservedSkippedClassSpacesInFile_doesNotLoadSkippedClassSpaceIntoAddressBook()
+    public void toModelType_preservedSkippedGroupsInFile_doesNotLoadSkippedGroupIntoAddressBook()
             throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_CLASS_SPACES_FILE,
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_GROUPS_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBook = dataFromFile.toModelType();
 
         // Only T01 (the valid one) should be loaded, not T01!!!
-        assertEquals(1, addressBook.getClassSpaceList().size());
-        assertEquals("T01", addressBook.getClassSpaceList().get(0).getClassSpaceName().value);
+        assertEquals(1, addressBook.getGroupList().size());
+        assertEquals("T01", addressBook.getGroupList().get(0).getGroupName().value);
     }
 
     @Test
@@ -444,16 +445,16 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_assignmentWithSpecialCharacterName_skipsClassSpaceAndAddsWarning() throws Exception {
+    public void toModelType_assignmentWithSpecialCharacterName_skipsGroupAndAddsWarning() throws Exception {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(INVALID_ASSIGNMENT_NAME_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
-        assertEquals(0, addressBookFromFile.getClassSpaceList().size());
-        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
+        assertEquals(0, addressBookFromFile.getGroupList().size());
+        assertEquals(1, dataFromFile.getPreservedSkippedGroups().size());
         assertEquals(1, dataFromFile.getLoadWarnings().size());
-        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid group"));
     }
 
     /**
@@ -473,8 +474,8 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_classSpaceWithMissingName_generatesEntryNumberWarning() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(MISSING_NAME_CLASS_SPACE_FILE,
+    public void toModelType_groupWithMissingName_generatesEntryNumberWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(MISSING_NAME_GROUP_FILE,
                 JsonSerializableAddressBook.class).orElseThrow();
 
         dataFromFile.toModelType();

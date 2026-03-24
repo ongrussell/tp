@@ -1,4 +1,4 @@
-package seedu.address.model.classspace;
+package seedu.address.model.group;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
@@ -8,69 +8,69 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import seedu.address.model.classspace.exceptions.ClassSpaceNotFoundException;
-import seedu.address.model.classspace.exceptions.DuplicateClassSpaceException;
+import seedu.address.model.group.exceptions.DuplicateGroupException;
+import seedu.address.model.group.exceptions.GroupNotFoundException;
 
 /**
- * A list of class spaces that enforces uniqueness between its elements and does not allow nulls.
+ * A list of groups that enforces uniqueness between its elements and does not allow nulls.
  */
-public class UniqueClassSpaceList implements Iterable<Group> {
+public class UniqueGroupList implements Iterable<Group> {
 
     private final ObservableList<Group> internalList = FXCollections.observableArrayList();
     private final ObservableList<Group> internalUnmodifiableList =
             FXCollections.unmodifiableObservableList(internalList);
 
     /**
-     * Returns true if the list contains an equivalent class space as the given argument.
+     * Returns true if the list contains an equivalent group as the given argument.
      */
     public boolean contains(Group toCheck) {
         requireNonNull(toCheck);
-        return internalList.stream().anyMatch(toCheck::isSameClassSpace);
+        return internalList.stream().anyMatch(toCheck::isSameGroup);
     }
 
     /**
-     * Adds a class space to the list.
+     * Adds a group to the list.
      */
     public void add(Group toAdd) {
         requireNonNull(toAdd);
         if (contains(toAdd)) {
-            throw new DuplicateClassSpaceException();
+            throw new DuplicateGroupException();
         }
         internalList.add(toAdd);
     }
 
     /**
-     * Replaces the class space {@code target} in the list with {@code editedGroup}.
+     * Replaces the group {@code target} in the list with {@code editedGroup}.
      */
-    public void setClassSpace(Group target, Group editedGroup) {
+    public void setGroup(Group target, Group editedGroup) {
         requireAllNonNull(target, editedGroup);
 
         int index = internalList.indexOf(target);
         if (index == -1) {
-            throw new ClassSpaceNotFoundException();
+            throw new GroupNotFoundException();
         }
 
-        if (!target.isSameClassSpace(editedGroup) && contains(editedGroup)) {
-            throw new DuplicateClassSpaceException();
+        if (!target.isSameGroup(editedGroup) && contains(editedGroup)) {
+            throw new DuplicateGroupException();
         }
 
         internalList.set(index, editedGroup);
     }
 
     /**
-     * Removes the equivalent class space from the list.
+     * Removes the equivalent group from the list.
      */
     public void remove(Group toRemove) {
         requireNonNull(toRemove);
         if (!internalList.remove(toRemove)) {
-            throw new ClassSpaceNotFoundException();
+            throw new GroupNotFoundException();
         }
     }
 
-    public void setClassSpaces(List<Group> groups) {
+    public void setGroups(List<Group> groups) {
         requireAllNonNull(groups);
-        if (!classSpacesAreUnique(groups)) {
-            throw new DuplicateClassSpaceException();
+        if (!groupsAreUnique(groups)) {
+            throw new DuplicateGroupException();
         }
 
         internalList.setAll(groups);
@@ -91,12 +91,12 @@ public class UniqueClassSpaceList implements Iterable<Group> {
             return true;
         }
 
-        if (!(other instanceof UniqueClassSpaceList)) {
+        if (!(other instanceof UniqueGroupList)) {
             return false;
         }
 
-        UniqueClassSpaceList otherUniqueClassSpaceList = (UniqueClassSpaceList) other;
-        return internalList.equals(otherUniqueClassSpaceList.internalList);
+        UniqueGroupList otherUniqueGroupList = (UniqueGroupList) other;
+        return internalList.equals(otherUniqueGroupList.internalList);
     }
 
     @Override
@@ -109,10 +109,10 @@ public class UniqueClassSpaceList implements Iterable<Group> {
         return internalList.toString();
     }
 
-    private boolean classSpacesAreUnique(List<Group> groups) {
+    private boolean groupsAreUnique(List<Group> groups) {
         for (int i = 0; i < groups.size() - 1; i++) {
             for (int j = i + 1; j < groups.size(); j++) {
-                if (groups.get(i).isSameClassSpace(groups.get(j))) {
+                if (groups.get(i).isSameGroup(groups.get(j))) {
                     return false;
                 }
             }

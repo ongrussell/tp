@@ -11,7 +11,7 @@ import java.util.Optional;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.MarkCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 
 /**
  * Parses input arguments and creates a new MarkCommand object.
@@ -42,14 +42,14 @@ public class MarkCommandParser implements Parser<MarkCommand> {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
             }
 
-            Optional<ClassSpaceName> classSpaceName = Optional.empty();
+            Optional<GroupName> groupName = Optional.empty();
             if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-                classSpaceName = Optional.of(
-                        ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get())
+                groupName = Optional.of(
+                        ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get())
                 );
             }
 
-            return new MarkCommand(index, date, classSpaceName);
+            return new MarkCommand(index, date, groupName);
         } catch (ParseException e) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, MarkCommand.MESSAGE_USAGE), e);

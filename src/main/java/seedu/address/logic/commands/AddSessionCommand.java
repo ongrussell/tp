@@ -8,60 +8,60 @@ import java.util.Optional;
 
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
 
 /**
- * Adds a session for a class space on a specific date across all students in that class space.
+ * Adds a session for a group on a specific date across all students in that group.
  */
 public class AddSessionCommand extends Command {
 
     public static final String COMMAND_WORD = "addsession";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Adds a session for a class space on a specific date.\n"
+            + ": Adds a session for a group on a specific date.\n"
             + "Parameters: d/YYYY-MM-DD [g/GROUP_NAME] [n/NOTE]\n"
             + "Example: " + COMMAND_WORD + " d/2026-03-16 g/T01 n/tutorial";
 
     public static final String MESSAGE_SUCCESS =
-            "Added session %1$s to class space %2$s for %3$d students.";
+            "Added session %1$s to group %2$s for %3$d students.";
     public static final String MESSAGE_SUCCESS_PARTIAL =
-            "Added session %1$s to class space %2$s for %3$d students. It already existed for %4$d students.";
-    public static final String MESSAGE_GROUP_NOT_FOUND = "This class space does not exist.";
-    public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
-            "No class space selected. Enter a class space first or provide g/GROUP_NAME.";
+            "Added session %1$s to group %2$s for %3$d students. It already existed for %4$d students.";
+    public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
+    public static final String MESSAGE_NO_ACTIVE_GROUP =
+            "No group selected. Enter a group first or provide g/GROUP_NAME.";
     public static final String MESSAGE_SESSION_ALREADY_EXISTS =
-            "Session %1$s already exists for all students in class space %2$s.";
+            "Session %1$s already exists for all students in group %2$s.";
 
     private final LocalDate sessionDate;
-    private final Optional<ClassSpaceName> classSpaceName;
+    private final Optional<GroupName> groupName;
     private final String note;
 
     public AddSessionCommand(LocalDate sessionDate) {
         this(sessionDate, Optional.empty(), "");
     }
 
-    public AddSessionCommand(LocalDate sessionDate, ClassSpaceName classSpaceName) {
-        this(sessionDate, Optional.of(classSpaceName), "");
+    public AddSessionCommand(LocalDate sessionDate, GroupName groupName) {
+        this(sessionDate, Optional.of(groupName), "");
     }
 
-    public AddSessionCommand(LocalDate sessionDate, ClassSpaceName classSpaceName, String note) {
-        this(sessionDate, Optional.of(classSpaceName), note);
+    public AddSessionCommand(LocalDate sessionDate, GroupName groupName, String note) {
+        this(sessionDate, Optional.of(groupName), note);
     }
 
     public AddSessionCommand(LocalDate sessionDate, String note) {
         this(sessionDate, Optional.empty(), note);
     }
 
-    private AddSessionCommand(LocalDate sessionDate, Optional<ClassSpaceName> classSpaceName, String note) {
+    private AddSessionCommand(LocalDate sessionDate, Optional<GroupName> groupName, String note) {
         requireNonNull(sessionDate);
-        requireNonNull(classSpaceName);
+        requireNonNull(groupName);
         requireNonNull(note);
         this.sessionDate = sessionDate;
-        this.classSpaceName = classSpaceName;
+        this.groupName = groupName;
         this.note = note.trim();
     }
 
@@ -69,16 +69,16 @@ public class AddSessionCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        if (classSpaceName.isPresent()) {
-            ClassSpaceName targetName = classSpaceName.get();
-            if (model.findClassSpaceByName(targetName).isEmpty()) {
+        if (groupName.isPresent()) {
+            GroupName targetName = groupName.get();
+            if (model.findGroupByName(targetName).isEmpty()) {
                 throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
             }
-            model.switchToClassSpaceView(targetName);
+            model.switchToGroupView(targetName);
         }
 
-        ClassSpaceName targetClassSpace = model.getActiveClassSpaceName()
-                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_CLASS_SPACE));
+        GroupName targetGroup = model.getActiveGroupName()
+                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
         String commandDescription = COMMAND_WORD + " d/" + sessionDate
                 + (note.isBlank() ? "" : " n/" + note);
         SessionCommandHistory.record(model, commandDescription);
@@ -86,10 +86,10 @@ public class AddSessionCommand extends Command {
         int createdCount = 0;
         int existingCount = 0;
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
-            if (!person.hasClassSpace(targetClassSpace)) {
+            if (!person.hasGroup(targetGroup)) {
                 continue;
             }
-            boolean sessionExists = Optional.ofNullable(person.getClassSpaceSessions().get(targetClassSpace))
+            boolean sessionExists = Optional.ofNullable(person.getGroupSessions().get(targetGroup))
                     .flatMap(sessionList -> sessionList.getSession(sessionDate))
                     .isPresent();
             if (sessionExists) {
@@ -99,20 +99,20 @@ public class AddSessionCommand extends Command {
 
             Session defaultSession = new Session(sessionDate,
                     new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), note);
-            model.setPerson(person, person.withUpdatedSession(targetClassSpace, defaultSession));
+            model.setPerson(person, person.withUpdatedSession(targetGroup, defaultSession));
             createdCount++;
         }
 
         if (createdCount == 0) {
-            throw new CommandException(String.format(MESSAGE_SESSION_ALREADY_EXISTS, sessionDate, targetClassSpace));
+            throw new CommandException(String.format(MESSAGE_SESSION_ALREADY_EXISTS, sessionDate, targetGroup));
         }
 
         model.setActiveSessionDate(sessionDate);
         if (existingCount > 0) {
             return new CommandResult(String.format(
-                    MESSAGE_SUCCESS_PARTIAL, sessionDate, targetClassSpace, createdCount, existingCount));
+                    MESSAGE_SUCCESS_PARTIAL, sessionDate, targetGroup, createdCount, existingCount));
         }
-        return new CommandResult(String.format(MESSAGE_SUCCESS, sessionDate, targetClassSpace, createdCount));
+        return new CommandResult(String.format(MESSAGE_SUCCESS, sessionDate, targetGroup, createdCount));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class AddSessionCommand extends Command {
 
         AddSessionCommand otherCommand = (AddSessionCommand) other;
         return sessionDate.equals(otherCommand.sessionDate)
-                && classSpaceName.equals(otherCommand.classSpaceName)
+                && groupName.equals(otherCommand.groupName)
                 && note.equals(otherCommand.note);
     }
 }

@@ -4,12 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
-import seedu.address.model.classspace.Group;
+import seedu.address.model.group.Group;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
 /**
- * Deletes a class space.
+ * Deletes a group.
  */
 public class DeleteGroupCommand extends Command {
 
@@ -22,28 +22,28 @@ public class DeleteGroupCommand extends Command {
     public static final String MESSAGE_SUCCESS = "Deleted group: %1$s";
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
 
-    private final ClassSpaceName classSpaceName;
+    private final GroupName groupName;
 
-    public DeleteGroupCommand(ClassSpaceName classSpaceName) {
-        this.classSpaceName = classSpaceName;
+    public DeleteGroupCommand(GroupName groupName) {
+        this.groupName = groupName;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Group group = model.findClassSpaceByName(classSpaceName)
+        Group group = model.findGroupByName(groupName)
                 .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
 
         for (Person person : java.util.List.copyOf(model.getAddressBook().getPersonList())) {
-            if (!person.hasClassSpace(classSpaceName)) {
+            if (!person.hasGroup(groupName)) {
                 continue;
             }
-            Person updatedPerson = person.withoutClassSpaceData(classSpaceName);
+            Person updatedPerson = person.withoutGroupData(groupName);
             model.setPerson(person, updatedPerson);
         }
 
-        model.deleteClassSpace(group);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, classSpaceName.value));
+        model.deleteGroup(group);
+        return new CommandResult(String.format(MESSAGE_SUCCESS, groupName.value));
     }
 
     @Override
@@ -55,6 +55,6 @@ public class DeleteGroupCommand extends Command {
             return false;
         }
         DeleteGroupCommand otherCommand = (DeleteGroupCommand) other;
-        return classSpaceName.equals(otherCommand.classSpaceName);
+        return groupName.equals(otherCommand.groupName);
     }
 }

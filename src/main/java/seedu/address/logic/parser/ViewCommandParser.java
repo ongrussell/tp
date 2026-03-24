@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import seedu.address.logic.commands.ViewCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 
 /**
@@ -35,9 +35,9 @@ public class ViewCommandParser implements Parser<ViewCommand> {
         String preamble = argMultimap.getPreamble();
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_GROUP, PREFIX_DATE, PREFIX_FROM_DATE, PREFIX_TO_DATE);
 
-        ClassSpaceName classSpaceName = null;
+        GroupName groupName = null;
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
-            classSpaceName = ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get());
+            groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
         }
 
         LocalDate sessionDate = null;
@@ -58,7 +58,7 @@ public class ViewCommandParser implements Parser<ViewCommand> {
         }
 
         if (preamble.isBlank()) {
-            return new ViewCommand(Optional.empty(), Optional.ofNullable(classSpaceName),
+            return new ViewCommand(Optional.empty(), Optional.ofNullable(groupName),
                     Optional.ofNullable(sessionDate), rangeStartDate, rangeEndDate);
         }
 
@@ -69,7 +69,7 @@ public class ViewCommandParser implements Parser<ViewCommand> {
 
         try {
             Attendance attendance = new Attendance(parts[0]);
-            return new ViewCommand(Optional.of(attendance), Optional.ofNullable(classSpaceName),
+            return new ViewCommand(Optional.of(attendance), Optional.ofNullable(groupName),
                     Optional.ofNullable(sessionDate), rangeStartDate, rangeEndDate);
         } catch (IllegalArgumentException e) {
             throw new ParseException(MESSAGE_INVALID_ATTENDANCE_STATUS + "\n" + ViewCommand.MESSAGE_USAGE, e);

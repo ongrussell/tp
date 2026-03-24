@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.assignment.AssignmentName;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
@@ -39,8 +39,8 @@ class JsonAdaptedPerson {
     private final String attendance;
     private final Integer participation;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
-    private final List<String> classSpaces = new ArrayList<>();
-    private final Map<String, List<JsonAdaptedSession>> classSpaceSessions = new HashMap<>();
+    private final List<String> groups = new ArrayList<>();
+    private final Map<String, List<JsonAdaptedSession>> groupSessions = new HashMap<>();
     private final Map<String, Map<String, Integer>> assignmentGrades = new HashMap<>();
 
     /**
@@ -52,8 +52,8 @@ class JsonAdaptedPerson {
             @JsonProperty("attendance") String attendance,
             @JsonProperty("participation") Integer participation,
             @JsonProperty("tags") List<JsonAdaptedTag> tags,
-            @JsonProperty("classSpaces") List<String> classSpaces,
-            @JsonProperty("classSpaceSessions") Map<String, List<JsonAdaptedSession>> classSpaceSessions,
+            @JsonProperty("groups") List<String> groups,
+            @JsonProperty("groupSessions") Map<String, List<JsonAdaptedSession>> groupSessions,
             @JsonProperty("assignmentGrades") Map<String, Map<String, Integer>> assignmentGrades) {
         this.name = name;
         this.phone = phone;
@@ -64,31 +64,31 @@ class JsonAdaptedPerson {
         if (tags != null) {
             this.tags.addAll(tags);
         }
-        if (classSpaces != null) {
-            this.classSpaces.addAll(classSpaces);
+        if (groups != null) {
+            this.groups.addAll(groups);
         }
-        if (classSpaceSessions != null) {
-            classSpaceSessions.forEach((classSpaceName, sessions) -> {
+        if (groupSessions != null) {
+            groupSessions.forEach((groupName, sessions) -> {
                 List<JsonAdaptedSession> adaptedSessions = sessions == null
                         ? new ArrayList<>()
                         : new ArrayList<>(sessions);
-                this.classSpaceSessions.put(classSpaceName, adaptedSessions);
+                this.groupSessions.put(groupName, adaptedSessions);
             });
         }
         if (assignmentGrades != null) {
-            assignmentGrades.forEach((classSpaceName, grades) -> {
+            assignmentGrades.forEach((groupName, grades) -> {
                 Map<String, Integer> adaptedGrades = grades == null ? new HashMap<>() : new HashMap<>(grades);
-                this.assignmentGrades.put(classSpaceName, adaptedGrades);
+                this.assignmentGrades.put(groupName, adaptedGrades);
             });
         }
     }
 
     public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
                              String attendance, Integer participation,
-                             List<JsonAdaptedTag> tags, List<String> classSpaces,
-                             Map<String, List<JsonAdaptedSession>> classSpaceSessions) {
+                             List<JsonAdaptedTag> tags, List<String> groups,
+                             Map<String, List<JsonAdaptedSession>> groupSessions) {
         this(name, phone, email, matricNumber, attendance, participation,
-                tags, classSpaces, classSpaceSessions, null);
+                tags, groups, groupSessions, null);
     }
 
     public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
@@ -110,17 +110,17 @@ class JsonAdaptedPerson {
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .toList());
-        classSpaces.addAll(source.getClassSpaces().stream()
-                .map(classSpaceName -> classSpaceName.value)
+        groups.addAll(source.getGroups().stream()
+                .map(groupName -> groupName.value)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList());
-        source.getClassSpaceSessions().forEach((classSpaceName,
-                                                sessionList) -> classSpaceSessions.put(
-                classSpaceName.value,
+        source.getGroupSessions().forEach((groupName,
+                                           sessionList) -> groupSessions.put(
+                groupName.value,
                 sessionList.getSessions().stream().map(JsonAdaptedSession::new).toList()
         ));
-        source.getAssignmentGrades().forEach((classSpaceName, gradeMap) ->
-                assignmentGrades.put(classSpaceName.value,
+        source.getAssignmentGrades().forEach((groupName, gradeMap) ->
+                assignmentGrades.put(groupName.value,
                         gradeMap.entrySet().stream()
                                 .collect(HashMap::new, (
                                         map, entry) -> map.put(entry.getKey().value, entry.getValue()),
@@ -181,9 +181,9 @@ class JsonAdaptedPerson {
             }
         }
 
-        for (String classSpace : classSpaces) {
-            if (!ClassSpaceName.isValidClassSpaceName(classSpace)) {
-                validationErrors.add(ClassSpaceName.MESSAGE_CONSTRAINTS);
+        for (String group : groups) {
+            if (!GroupName.isValidGroupName(group)) {
+                validationErrors.add(GroupName.MESSAGE_CONSTRAINTS);
             }
         }
 
@@ -197,9 +197,9 @@ class JsonAdaptedPerson {
         final MatricNumber modelMatricNumber = new MatricNumber(matricNumber);
         final Set<Tag> modelTags = new HashSet<>(personTags);
 
-        final Set<ClassSpaceName> modelClassSpaces = new HashSet<>();
-        for (String classSpace : classSpaces) {
-            modelClassSpaces.add(new ClassSpaceName(classSpace));
+        final Set<GroupName> modelGroups = new HashSet<>();
+        for (String group : groups) {
+            modelGroups.add(new GroupName(group));
         }
         final Attendance modelAttendance;
         if (attendance == null) {
@@ -219,40 +219,40 @@ class JsonAdaptedPerson {
             modelParticipation = new Participation(participation);
         }
 
-        Person person = new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelClassSpaces, modelTags);
+        Person person = new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelGroups, modelTags);
         person = new Person(person, modelAttendance);
         person = new Person(person, modelParticipation);
-        person = new Person(person, parseClassSpaceSessions());
+        person = new Person(person, parseGroupSessions());
         person = new Person(person, parseAssignmentGrades(), true);
         return person;
     }
 
-    private Map<ClassSpaceName, SessionList> parseClassSpaceSessions() throws IllegalValueException {
-        Map<ClassSpaceName, SessionList> modelSessionMap = new HashMap<>();
-        for (Map.Entry<String, List<JsonAdaptedSession>> entry : classSpaceSessions.entrySet()) {
-            String classSpaceNameString = entry.getKey();
-            if (!ClassSpaceName.isValidClassSpaceName(classSpaceNameString)) {
-                throw new IllegalValueException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+    private Map<GroupName, SessionList> parseGroupSessions() throws IllegalValueException {
+        Map<GroupName, SessionList> modelSessionMap = new HashMap<>();
+        for (Map.Entry<String, List<JsonAdaptedSession>> entry : groupSessions.entrySet()) {
+            String groupNameString = entry.getKey();
+            if (!GroupName.isValidGroupName(groupNameString)) {
+                throw new IllegalValueException(GroupName.MESSAGE_CONSTRAINTS);
             }
-            ClassSpaceName classSpaceName = new ClassSpaceName(classSpaceNameString);
+            GroupName groupName = new GroupName(groupNameString);
             List<Session> sessions = new ArrayList<>();
             List<JsonAdaptedSession> adaptedSessions = entry.getValue() == null ? List.of() : entry.getValue();
             for (JsonAdaptedSession adaptedSession : adaptedSessions) {
                 sessions.add(adaptedSession.toModelType());
             }
-            modelSessionMap.put(classSpaceName, new SessionList(sessions));
+            modelSessionMap.put(groupName, new SessionList(sessions));
         }
         return modelSessionMap;
     }
 
-    private Map<ClassSpaceName, Map<AssignmentName, Integer>> parseAssignmentGrades() throws IllegalValueException {
-        Map<ClassSpaceName, Map<AssignmentName, Integer>> modelAssignmentGrades = new HashMap<>();
+    private Map<GroupName, Map<AssignmentName, Integer>> parseAssignmentGrades() throws IllegalValueException {
+        Map<GroupName, Map<AssignmentName, Integer>> modelAssignmentGrades = new HashMap<>();
         for (Map.Entry<String, Map<String, Integer>> entry : assignmentGrades.entrySet()) {
-            String classSpaceNameString = entry.getKey();
-            if (!ClassSpaceName.isValidClassSpaceName(classSpaceNameString)) {
-                throw new IllegalValueException(ClassSpaceName.MESSAGE_CONSTRAINTS);
+            String groupNameString = entry.getKey();
+            if (!GroupName.isValidGroupName(groupNameString)) {
+                throw new IllegalValueException(GroupName.MESSAGE_CONSTRAINTS);
             }
-            ClassSpaceName classSpaceName = new ClassSpaceName(classSpaceNameString);
+            GroupName groupName = new GroupName(groupNameString);
             Map<AssignmentName, Integer> classGrades = new HashMap<>();
             Map<String, Integer> storedGrades = entry.getValue() == null ? Map.of() : entry.getValue();
             for (Map.Entry<String, Integer> gradeEntry : storedGrades.entrySet()) {
@@ -266,9 +266,8 @@ class JsonAdaptedPerson {
                 }
                 classGrades.put(new AssignmentName(assignmentNameString), gradeValue);
             }
-            modelAssignmentGrades.put(classSpaceName, classGrades);
+            modelAssignmentGrades.put(groupName, classGrades);
         }
         return modelAssignmentGrades;
     }
 }
-

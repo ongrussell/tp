@@ -12,32 +12,32 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
 
 /**
- * Shared logic for commands that target students for class space membership updates.
+ * Shared logic for commands that target students for group membership updates.
  */
 abstract class GroupMembershipCommand extends Command {
 
-    protected final ClassSpaceName classSpaceName;
+    protected final GroupName groupName;
     protected final List<Index> targetIndexes;
     protected final List<MatricNumber> targetMatricNumbers;
 
-    GroupMembershipCommand(ClassSpaceName classSpaceName, List<Index> targetIndexes) {
-        requireNonNull(classSpaceName);
+    GroupMembershipCommand(GroupName groupName, List<Index> targetIndexes) {
+        requireNonNull(groupName);
         requireNonNull(targetIndexes);
-        this.classSpaceName = classSpaceName;
+        this.groupName = groupName;
         this.targetIndexes = List.copyOf(targetIndexes);
         this.targetMatricNumbers = List.of();
     }
 
-    GroupMembershipCommand(ClassSpaceName classSpaceName, List<MatricNumber> targetMatricNumbers,
+    GroupMembershipCommand(GroupName groupName, List<MatricNumber> targetMatricNumbers,
                            boolean ignored) {
-        requireNonNull(classSpaceName);
+        requireNonNull(groupName);
         requireNonNull(targetMatricNumbers);
-        this.classSpaceName = classSpaceName;
+        this.groupName = groupName;
         this.targetIndexes = List.of();
         this.targetMatricNumbers = List.copyOf(targetMatricNumbers);
     }
