@@ -56,8 +56,9 @@ Person --> "*" GroupName
 Person *--> Phone
 Person *--> Email
 Person *--> MatricNumber
-Person *--> " * " Tag
-Person *--> " * " SessionList
+Person *--> " *" Tag
+Person *-> " * " SessionList
+Person ---> "*" AssignmentName
 SessionList *--> " * " Session
 
 Person -[hidden]up--> I
