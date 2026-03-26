@@ -347,6 +347,13 @@
     -fx-text-fill: white;
 }
 
+#ghostTextLabel {
+    -fx-font-family: "Segoe UI Light";
+    -fx-font-size: 13pt;
+    -fx-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-padding: 6 0 0 12; /* tweaked until aligned, don't change */
+}
+
 #filterField, #personListPanel, #personWebpage {
     -fx-effect: innershadow(gaussian, black, 10, 0, 0, 0);
 }
