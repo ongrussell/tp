@@ -22,6 +22,7 @@ public class CommandBox extends UiPart<Region> {
     public static final String ERROR_STYLE_CLASS = "error";
     private static final String FXML = "CommandBox.fxml";
     private static final List<String> COMMAND_SUGGESTIONS = CommandRegistry.COMMAND_WORDS;
+    // TODO: Use AddressBookParser.getCommandWords() instead to reduce duplication
 
     private final CommandExecutor commandExecutor;
 
