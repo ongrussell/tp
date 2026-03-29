@@ -24,6 +24,7 @@ Person *--> MatricNumber
 Person *-down-> "*" SessionList
 
 SessionList -right-> "*" Session
+Session *--> LocalDate
 Session *--> Attendance
 Session *--> Participation
 

@@ -21,6 +21,7 @@ Class Assignment
 Class AssignmentName
 Class SessionList
 Class Session
+Class LocalDate
 Class Attendance
 Class Participation
 Class Person
@@ -62,9 +63,9 @@ Person *--> " *" Tag
 Person *-> " * " SessionList
 Person --> "*" AssignmentName
 SessionList *--> " * " Session
+Session *--> "1 " LocalDate
 Session *--> "1 " Attendance
 Session *--> "1 " Participation
-'Kawai can add LocalDate class here
 
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
