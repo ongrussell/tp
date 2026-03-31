@@ -127,7 +127,7 @@ The `Model` component,
 * stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object) and all `Group` objects (which are contained in a `UniqueGroupList` object).
 * stores each `Group`'s assignments (all `Assignment` objects which are contained in a `UniqueAssignmentList` object within each `Group`).
 * stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
-* stores each `Person`'s session data (all `Session` objects which are contained in a `SessionList` object within each `Person`), keyed by `GroupName` with one `SessionList` per group.
+* stores each `Person`'s session data (all `Session` objects, each containing a `LocalDate`, `Attendance`, and `Participation`, which are contained in a `SessionList` object within each `Person`), keyed by `GroupName` with one `SessionList` per group.
 * stores each `Person`'s assignment grades as a mapping of `GroupName` to `AssignmentName` to grade, allowing for per-group assignment grade tracking.
 * stores a `UserPrefs` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
