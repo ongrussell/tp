@@ -71,16 +71,14 @@ public class AddressBookParser {
 
         switch (commandWord) {
 
+        // Contact list commands
         case AddCommand.COMMAND_WORD: return new AddCommandParser().parse(arguments);
         case ListCommand.COMMAND_WORD: return new ListCommand();
         case EditCommand.COMMAND_WORD: return new EditCommandParser().parse(arguments);
         case DeleteCommand.COMMAND_WORD: return new DeleteCommandParser().parse(arguments);
         case ClearCommand.COMMAND_WORD: return new ClearCommand();
 
-        case MarkCommand.COMMAND_WORD: return new MarkCommandParser().parse(arguments);
-        case UnmarkCommand.COMMAND_WORD: return new UnmarkCommandParser().parse(arguments);
-        case PartCommand.COMMAND_WORD: return new PartCommandParser().parse(arguments);
-
+        // Assignment commands
         case CreateAssignmentCommand.COMMAND_WORD:
         case CreateAssignmentCommand.SHORT_COMMAND_WORD:
             return new CreateAssignmentCommandParser().parse(arguments);
@@ -97,6 +95,7 @@ public class AddressBookParser {
         case DeleteAssignmentCommand.SHORT_COMMAND_WORD:
             return new DeleteAssignmentCommandParser().parse(arguments);
 
+        // Group commands
         case CreateGroupCommand.COMMAND_WORD: return new CreateGroupCommandParser().parse(arguments);
         case ListGroupsCommand.COMMAND_WORD:
             if (!arguments.trim().isEmpty()) {
@@ -117,6 +116,10 @@ public class AddressBookParser {
         case UndoSessionCommand.COMMAND_WORD: return new UndoSessionCommand();
         case DeleteSessionCommand.COMMAND_WORD: return new DeleteSessionCommandParser().parse(arguments);
         case ExportViewCommand.COMMAND_WORD: return new ExportViewCommandParser().parse(arguments);
+
+        case MarkCommand.COMMAND_WORD: return new MarkCommandParser().parse(arguments);
+        case UnmarkCommand.COMMAND_WORD: return new UnmarkCommandParser().parse(arguments);
+        case PartCommand.COMMAND_WORD: return new PartCommandParser().parse(arguments);
 
         case FindCommand.COMMAND_WORD: return new FindCommandParser().parse(arguments);
 
