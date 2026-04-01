@@ -262,4 +262,28 @@ public class JsonAddressBookStorageTest {
         // so storage warnings should be empty after a fatal load failure
         assertEquals(0, storage.getLastLoadWarnings().size());
     }
+
+    @Test
+    public void readAddressBook_emptyFile_returnsEmptyAddressBook() throws Exception {
+        // BVA: zero-byte file → Optional.empty() (triggers sample data)
+        Path filePath = testFolder.resolve("emptyAddressBook.json");
+        java.nio.file.Files.createFile(filePath);
+
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+        java.util.Optional<ReadOnlyAddressBook> result = storage.readAddressBook(filePath);
+
+        assertFalse(result.isPresent(), "Empty file should return Optional.empty() to trigger sample data");
+    }
+
+    @Test
+    public void readAddressBook_blankFile_returnsEmptyAddressBook() throws Exception {
+        // EP: whitespace-only content → Optional.empty() (triggers sample data)
+        Path filePath = testFolder.resolve("blankAddressBook.json");
+        java.nio.file.Files.writeString(filePath, "   \n  \t  ");
+
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+        java.util.Optional<ReadOnlyAddressBook> result = storage.readAddressBook(filePath);
+
+        assertFalse(result.isPresent(), "Blank file should return Optional.empty() to trigger sample data");
+    }
 }
