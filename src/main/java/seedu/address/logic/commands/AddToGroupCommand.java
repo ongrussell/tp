@@ -5,8 +5,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
@@ -27,6 +29,7 @@ public class AddToGroupCommand extends GroupMembershipCommand {
             + "          " + COMMAND_WORD + " g/T01 i/1,3-5";
 
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
+    private static final Logger logger = LogsCenter.getLogger(AddToGroupCommand.class);
 
     private AddToGroupCommand(GroupName groupName, List<Index> targetIndexes) {
         super(groupName, targetIndexes);
@@ -49,11 +52,15 @@ public class AddToGroupCommand extends GroupMembershipCommand {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        logger.info("Attempting to add students to group: " + groupName.value);
         if (model.findGroupByName(groupName).isEmpty()) {
+            logger.warning("Attempted to add students to missing group: " + groupName.value);
             throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
         }
 
         List<Person> targetPersons = resolveTargetPersons(model);
+        logger.fine("Resolved " + targetPersons.size() + " student(s) for add-to-group.");
+
         List<String> addedStudents = new ArrayList<>();
         List<String> alreadyMembers = new ArrayList<>();
 
@@ -72,6 +79,10 @@ public class AddToGroupCommand extends GroupMembershipCommand {
             model.setPerson(person, updatedPerson);
             addedStudents.add(person.getName().fullName); // TODO: Improve Law of Demeter
         }
+
+        logger.info("Completed add-to-group for " + groupName.value
+                + ". Added: " + addedStudents.size()
+                + ", already members: " + alreadyMembers.size());
 
         return new CommandResult(buildFeedbackMessage(addedStudents, alreadyMembers));
     }

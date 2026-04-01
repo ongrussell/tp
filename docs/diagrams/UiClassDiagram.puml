@@ -4,9 +4,10 @@ skinparam arrowThickness 1.1
 skinparam arrowColor UI_COLOR_T4
 skinparam classBackgroundColor UI_COLOR
 
-package UI <<Rectangle>>{
+package UI <<Rectangle>> {
 Class "<<interface>>\nUi" as Ui
-Class "{abstract}\nUiPart" as UiPart
+Class "      {abstract}      \nUiPart" as UiPart
+
 Class UiManager
 Class MainWindow
 Class HelpWindow
@@ -17,44 +18,45 @@ Class StatusBarFooter
 Class CommandBox
 }
 
-package Model <<Rectangle>> {
-Class HiddenModel #FFFFFF
-}
-
 package Logic <<Rectangle>> {
 Class HiddenLogic #FFFFFF
+}
+
+package Model <<Rectangle>> {
+Class HiddenModel #FFFFFF
 }
 
 Class HiddenOutside #FFFFFF
 HiddenOutside ..> Ui
 
-UiManager .left.|> Ui
-UiManager -down-> "1" MainWindow
-MainWindow *-down->  "1" CommandBox
-MainWindow *-down-> "1" ResultDisplay
-MainWindow *-down-> "1" PersonListPanel
-MainWindow *-down-> "1" StatusBarFooter
-MainWindow --> "0..1" HelpWindow
+UiManager ..up|> Ui
+UiManager -right> Logic
+UiManager --down> "1" MainWindow
+Model -left[hidden]> Logic
 
-PersonListPanel -down-> "*" PersonCard
+PersonListPanel -|> UiPart
+StatusBarFooter -|> UiPart
+ResultDisplay -|> UiPart
+CommandBox -|> UiPart
+HelpWindow -|> UiPart
+MainWindow ---------|> UiPart
 
-MainWindow -left-|> UiPart
-
-ResultDisplay --|> UiPart
-CommandBox --|> UiPart
-PersonListPanel --|> UiPart
 PersonCard --|> UiPart
-StatusBarFooter --|> UiPart
-HelpWindow --|> UiPart
 
-PersonCard ..> Model
-UiManager -right-> Logic
-MainWindow -left-> Logic
+MainWindow --up> Logic
+MainWindow *-down> "1  " StatusBarFooter
+MainWindow *-down> "1  " ResultDisplay
+MainWindow *-down> "1  " CommandBox
+MainWindow *-down> "1     " HelpWindow
+MainWindow *-down> "1  " PersonListPanel
 
-PersonListPanel -[hidden]left- HelpWindow
-HelpWindow -[hidden]left- CommandBox
-CommandBox -[hidden]left- ResultDisplay
-ResultDisplay -[hidden]left- StatusBarFooter
+PersonListPanel --down> " *" PersonCard
+PersonListPanel ....> Model
+PersonCard ..up> Model
 
-MainWindow -[hidden]-|> UiPart
+StatusBarFooter --[hidden]> PersonListPanel
+ResultDisplay --[hidden]> StatusBarFooter
+CommandBox --[hidden]> ResultDisplay
+HelpWindow --[hidden]> CommandBox
+
 @enduml

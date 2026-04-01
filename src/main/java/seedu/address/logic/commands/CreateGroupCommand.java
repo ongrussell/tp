@@ -2,6 +2,9 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.logging.Logger;
+
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.group.Group;
@@ -20,6 +23,8 @@ public class CreateGroupCommand extends Command {
     public static final String MESSAGE_SUCCESS = "Created group: %1$s";
     public static final String MESSAGE_DUPLICATE_GROUP = "This group already exists.";
 
+    private static final Logger logger = LogsCenter.getLogger(CreateGroupCommand.class);
+
     private final Group group;
 
     public CreateGroupCommand(Group group) {
@@ -29,10 +34,13 @@ public class CreateGroupCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        logger.info("Attempting to create group: " + group.getGroupName().value);
         if (model.hasGroup(group)) {
+            logger.warning("Duplicate group creation attempted: " + group.getGroupName().value);
             throw new CommandException(MESSAGE_DUPLICATE_GROUP);
         }
         model.addGroup(group);
+        logger.info("Created group: " + group.getGroupName().value);
         return new CommandResult(String.format(MESSAGE_SUCCESS, group.getGroupName().value));
     }
 

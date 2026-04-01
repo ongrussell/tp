@@ -2,6 +2,9 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.logging.Logger;
+
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.group.Group;
@@ -21,6 +24,7 @@ public class DeleteGroupCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "Deleted group: %1$s";
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
+    private static final Logger logger = LogsCenter.getLogger(DeleteGroupCommand.class);
 
     private final GroupName groupName;
 
@@ -31,8 +35,15 @@ public class DeleteGroupCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        logger.info("Attempting to delete group: " + groupName.value);
+
         Group group = model.findGroupByName(groupName)
-                .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
+                .orElseThrow(() -> {
+                    logger.warning("Attempted to delete missing group: " + groupName.value);
+                    return new CommandException(MESSAGE_GROUP_NOT_FOUND);
+                });
+
+        int affectedStudents = 0;
 
         for (Person person : java.util.List.copyOf(model.getAddressBook().getPersonList())) {
             if (!person.hasGroup(groupName)) {
@@ -40,9 +51,12 @@ public class DeleteGroupCommand extends Command {
             }
             Person updatedPerson = person.withoutGroupData(groupName);
             model.setPerson(person, updatedPerson);
+            affectedStudents++;
         }
 
         model.deleteGroup(group);
+        logger.info("Deleted group: " + groupName.value
+                + ". Removed membership from " + affectedStudents + " student(s).");
         return new CommandResult(String.format(MESSAGE_SUCCESS, groupName.value));
     }
 
