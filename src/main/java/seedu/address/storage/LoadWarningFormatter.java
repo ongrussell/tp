@@ -15,7 +15,7 @@ public class LoadWarningFormatter {
      * @param errorMessage Validation error message describing why the entry was skipped.
      * @return Formatted warning string.
      */
-    static String formatInvalidEntryWarning(String entityType, String identifier, String errorMessage) {
+    public static String formatInvalidEntryWarning(String entityType, String identifier, String errorMessage) {
         String[] errors = errorMessage.split(";\\s*");
 
         StringBuilder sb = new StringBuilder("Skipped invalid ")
@@ -38,7 +38,7 @@ public class LoadWarningFormatter {
      * @param identifier Display identifier for the entry.
      * @return Formatted warning string.
      */
-    private static String formatDuplicateEntryWarning(String entityType, String identifier) {
+    public static String formatDuplicateEntryWarning(String entityType, String identifier) {
         return "Skipped duplicate " + entityType + ": " + identifier;
     }
 }
