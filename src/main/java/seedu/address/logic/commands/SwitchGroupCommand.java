@@ -12,6 +12,7 @@ import seedu.address.model.group.GroupName;
 /**
  * Switches the current displayed view to all students or a group.
  */
+// @@author ongrussell
 public class SwitchGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "switchgroup";
@@ -68,3 +69,4 @@ public class SwitchGroupCommand extends Command {
         return Objects.equals(groupName, otherCommand.groupName);
     }
 }
+// @@author

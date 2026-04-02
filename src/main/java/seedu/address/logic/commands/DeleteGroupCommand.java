@@ -14,6 +14,7 @@ import seedu.address.model.person.Person;
 /**
  * Deletes a group.
  */
+// @@author ongrussell
 public class DeleteGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "deletegroup";
@@ -73,3 +74,4 @@ public class DeleteGroupCommand extends Command {
         return groupName.equals(otherCommand.groupName);
     }
 }
+// @@author

@@ -12,6 +12,7 @@ import seedu.address.model.group.Group;
 /**
  * Lists all groups.
  */
+// @@author ongrussell
 public class ListGroupsCommand extends Command {
 
     public static final String COMMAND_WORD = "listgroups";
@@ -44,3 +45,4 @@ public class ListGroupsCommand extends Command {
         return new CommandResult(builder.toString());
     }
 }
+// @@author

@@ -11,6 +11,7 @@ import seedu.address.model.person.Person;
 /**
  * Renames an existing group.
  */
+// @@author ongrussell
 public class RenameGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "renamegroup";
@@ -72,3 +73,4 @@ public class RenameGroupCommand extends Command {
                 && newName.equals(otherCommand.newName);
     }
 }
+// @@author

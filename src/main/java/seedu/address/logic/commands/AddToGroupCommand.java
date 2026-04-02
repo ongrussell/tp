@@ -19,6 +19,7 @@ import seedu.address.model.person.Person;
 /**
  * Adds one or more students to a group.
  */
+// @@author ongrussell
 public class AddToGroupCommand extends GroupMembershipCommand {
 
     public static final String COMMAND_WORD = "addtogroup";
@@ -108,3 +109,4 @@ public class AddToGroupCommand extends GroupMembershipCommand {
         return names.stream().sorted(String.CASE_INSENSITIVE_ORDER).collect(Collectors.joining(", "));
     }
 }
+// @@author

@@ -12,6 +12,7 @@ import seedu.address.model.group.Group;
 /**
  * Creates a new group.
  */
+// @@author ongrussell
 public class CreateGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "creategroup";
@@ -57,3 +58,4 @@ public class CreateGroupCommand extends Command {
         return group.equals(otherCommand.group);
     }
 }
+// @@author

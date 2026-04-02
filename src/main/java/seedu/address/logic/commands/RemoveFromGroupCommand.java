@@ -16,6 +16,7 @@ import seedu.address.model.person.Person;
 /**
  * Removes one or more students from a group.
  */
+// @@author ongrussell
 public class RemoveFromGroupCommand extends GroupMembershipCommand {
 
     public static final String COMMAND_WORD = "removefromgroup";
@@ -91,3 +92,4 @@ public class RemoveFromGroupCommand extends GroupMembershipCommand {
         return names.stream().sorted(String.CASE_INSENSITIVE_ORDER).collect(Collectors.joining(", "));
     }
 }
+// @@author
