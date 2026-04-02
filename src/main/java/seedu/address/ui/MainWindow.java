@@ -26,8 +26,8 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
-    private static final double COMMANDBOX_STARTUP_SIZE = 0; // set to minimum size on startup
-    private static final double RESULTDISPLAY_STARTUP_SIZE = 0; // set to minimum size on startup
+    private static final double COMMANDBOX_STARTUP_HEIGHT_PX = 45.0;
+    private static final double RESULTDISPLAY_STARTUP_HEIGHT_PX = 120.0;
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
@@ -138,6 +138,9 @@ public class MainWindow extends UiPart<Stage> {
      */
     void fillInnerParts() {
 
+        resultDisplay = new ResultDisplay();
+        resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
+
         CommandBox commandBox = new CommandBox(
                 this::executeCommand,
                 // For command autocompletion feature:
@@ -157,21 +160,28 @@ public class MainWindow extends UiPart<Stage> {
                 this::executeCommand);
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
 
-        resultDisplay = new ResultDisplay();
-        resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
-
         StatusBarFooter statusBarFooter = new StatusBarFooter(
                 logic.getAddressBookFilePath(),
                 logic.currentViewProperty());
         statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
 
-        // Make commandBox and resultDisplay not resize when resizing app window
+        // Make commandBox and resultDisplay not resize when resizing app window:
         SplitPane.setResizableWithParent(commandBoxPlaceholder, false);
         SplitPane.setResizableWithParent(resultDisplayPlaceholder, false);
-        // Exclude personListPanelPlaceholder so that it absorbs window resizes
+        SplitPane.setResizableWithParent(personListPanelPlaceholder, true);
+        // exclude personListPanelPlaceholder so that it absorbs window resizes
 
-        // Startup sizes of the 3 resizeable placeholders (commandBox, resultDisplay, personListPanel)
-        Platform.runLater(() -> mainSplitPane.setDividerPositions(COMMANDBOX_STARTUP_SIZE, RESULTDISPLAY_STARTUP_SIZE));
+        // Set startup heights of the 2 resizeable placeholders (commandBox, resultDisplay):
+        Platform.runLater(() -> {
+            double totalHeight = mainSplitPane.getHeight();
+            double commandBoxRatio = (totalHeight > 0)
+                    ? COMMANDBOX_STARTUP_HEIGHT_PX / totalHeight
+                    : 0;
+            double resultDisplayRatio = (totalHeight > 0)
+                    ? (COMMANDBOX_STARTUP_HEIGHT_PX + RESULTDISPLAY_STARTUP_HEIGHT_PX) / totalHeight
+                    : 0;
+            mainSplitPane.setDividerPositions(commandBoxRatio, resultDisplayRatio);
+        });
     }
 
     /**
